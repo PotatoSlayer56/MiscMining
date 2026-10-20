@@ -1,0 +1,29 @@
+{
+	"schemaVersion": 1,
+	"id": "misc-mining",
+	"version": "${version}",
+	"name": "Misc Mining",
+	"description": "Miscellaneous Mining Features",
+	"authors": [
+		"PotatoSlayer56"
+	],
+	"contact": {
+	},
+	"license": "MIT",
+	"icon": "assets/misc-mining/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"potatoslayer56.miscmining.MiscMining"
+		]
+	},
+	"mixins": [
+	],
+	"depends": {
+		"fabricloader": ">=0.19.5",
+		"minecraft": "~26.2",
+		"java": ">=25",
+		"fabric-api": "*",
+		"hypixel-mod-api": ">=1.0"
+	}
+}
