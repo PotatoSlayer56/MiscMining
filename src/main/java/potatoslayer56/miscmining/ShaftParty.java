@@ -11,8 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static potatoslayer56.miscmining.MiscMining.client;
-import static potatoslayer56.miscmining.MiscMining.sendCommandFromPlayer;
+import static potatoslayer56.miscmining.MiscMining.*;
 
 public class ShaftParty {
 
@@ -39,8 +38,8 @@ public class ShaftParty {
     "PERI_2",
     "PERI_C",
     "CITR_1",
-    "CIRT_2",
-    "CIRT_3",
+    "CITR_2",
+    "CITR_C",
     "AQUA_1",
     "AQUA_2",
     "AQUA_C",
@@ -58,6 +57,8 @@ public class ShaftParty {
 
     HypixelModAPI.getInstance().createHandler(ClientboundLocationPacket.class, clientboundLocationPacket -> {
       shaftType = getPlayerShaftType();
+
+      clientMessage(shaftType);
 
       if (inShaftParty) {
         shaftPartyMemebers.forEach((member, type) -> {
@@ -81,6 +82,8 @@ public class ShaftParty {
     playerTeams.forEach(playerTeam -> {
       Component prefix = playerTeam.getPlayerPrefix();
       Component suffix = playerTeam.getPlayerSuffix();
+      client.player.sendSystemMessage(prefix);
+      client.player.sendSystemMessage(suffix);
 
       scoreboardTextBuilder.append(prefix.getString());
       scoreboardTextBuilder.append(suffix.getString());
@@ -97,3 +100,5 @@ public class ShaftParty {
     return "N/A";
   }
 }
+
+// TITA_1 TUNG_1 UMBE_1 JADE_1 AMBE_1 TOPA_1 SAPP_1 AMET_1 JASP_1 JASP_C RUBY_1 RUBY_2 RUBY_C OPAL_1 OPAL_C ONYX_1 ONYX_2 ONYX_C PERI_1 PERI_2 PERI_C CITR_1 CITR_2 CITR_C AQUA_1 AQUA_2 AQUA_C FAIR_1 LITT_L

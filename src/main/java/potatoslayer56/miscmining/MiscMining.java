@@ -61,6 +61,7 @@ public class MiscMining implements ModInitializer {
 		registerSubCommand("metalprices", new MetalPrices());
 		registerSubCommand("skeletonkeyprofit", new SkeletonKeyProfit());
 		registerSubCommand("refreshprices", new RefreshPrices());
+		registerSubCommand("dev", new Dev());
 
 		MainCommand.register();
 		ShaftParty.init();
