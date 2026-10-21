@@ -2,34 +2,27 @@ package potatoslayer56.miscmining;
 
 import net.fabricmc.api.ModInitializer;
 
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.hypixel.modapi.HypixelModAPI;
 import net.hypixel.modapi.packet.impl.clientbound.event.ClientboundLocationPacket;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.protocol.game.ClientboundSetScorePacket;
 import net.minecraft.resources.Identifier;
 
-import net.minecraft.world.scores.DisplaySlot;
-import net.minecraft.world.scores.Objective;
-import net.minecraft.world.scores.PlayerScoreEntry;
+import net.minecraft.world.scores.*;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import potatoslayer56.miscmining.commands.*;
-import potatoslayer56.miscmining.commands.maincommand.MainCommand;
-import potatoslayer56.miscmining.commands.maincommand.MetalPrices;
-import potatoslayer56.miscmining.commands.maincommand.RefreshPrices;
-import potatoslayer56.miscmining.commands.maincommand.SkeletonKeyProfit;
+import potatoslayer56.miscmining.commands.maincommand.*;
+import potatoslayer56.miscmining.commands.shaftparty.ShaftMiningCommand;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -47,8 +40,6 @@ public class MiscMining implements ModInitializer {
 
 	public static Map<String, CustomCommand> subCommands = new HashMap<>();
 
-	public static boolean inShaftParty = false;
-	public static String lobbyType;
 
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
@@ -72,12 +63,8 @@ public class MiscMining implements ModInitializer {
 		registerSubCommand("refreshprices", new RefreshPrices());
 
 		MainCommand.register();
-
-		HypixelModAPI.getInstance().createHandler(ClientboundLocationPacket.class, clientboundLocationPacket -> {
-			
-		});
-
-		HypixelModAPI.getInstance().subscribeToEventPacket(ClientboundLocationPacket.class);
+		ShaftParty.init();
+		ShaftMiningCommand.register();
 	}
 
 	public static Identifier id(String path) {
@@ -153,7 +140,15 @@ public class MiscMining implements ModInitializer {
 	}
 
 	public static void clientMessage(String message) {
-		client.gui.hud.getChat().addClientSystemMessage(Component.literal(message));
+		if (client.player != null) client.player.sendSystemMessage(Component.literal(message));
+	}
+
+	public static void clientPrefixedMessage(String message) {
+		if (client.player != null) client.player.sendSystemMessage(Component.literal("§8[§bMisc§dMining§8] %s".formatted(message)));
+	}
+
+	public static void sendCommandFromPlayer(String command) {
+		if (client.player != null) client.player.connection.sendCommand(command);
 	}
 
 	public static void registerSubCommand(String name, CustomCommand command) {

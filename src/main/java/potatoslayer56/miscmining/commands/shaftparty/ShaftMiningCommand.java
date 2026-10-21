@@ -3,15 +3,26 @@ package potatoslayer56.miscmining.commands.shaftparty;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommands;
+import potatoslayer56.miscmining.ShaftParty;
 
-import static potatoslayer56.miscmining.MiscMining.inShaftParty;
+import java.util.HashMap;
+
+import static potatoslayer56.miscmining.MiscMining.clientPrefixedMessage;
 
 public class ShaftMiningCommand {
   public static void register() {
     ClientCommandRegistrationCallback.EVENT.register(((commandDispatcher, commandBuildContext) -> {
       commandDispatcher.register(ClientCommands.literal("toggleshaftparty")
         .executes(commandContext -> {
-          inShaftParty = true;
+          ShaftParty.inShaftParty = !ShaftParty.inShaftParty;
+          if (!ShaftParty.inShaftParty) {
+              ShaftParty.shaftPartyMemebers = new HashMap<>();
+              ShaftParty.waitingForJoin = "";
+              clientPrefixedMessage("§aDisbanded shaft party");
+          }
+          else {
+            clientPrefixedMessage("§aCreated shaft party");
+          }
           return 0;
       }));
     }));
@@ -19,10 +30,27 @@ public class ShaftMiningCommand {
     ClientCommandRegistrationCallback.EVENT.register(((commandDispatcher, commandBuildContext) -> {
       commandDispatcher.register(ClientCommands.literal("registershaftpartymember")
         .then(ClientCommands.argument("ign", StringArgumentType.word())
-        .then(ClientCommands.argument("type", StringArgumentType.word())
-        .suggests(new ShaftPartyTypeSuggestionsProvider()).executes(commandContext -> {
+        .then(ClientCommands.argument("type", StringArgumentType.greedyString())
+        .suggests(new ShaftPartyTypeSuggestionsProvider())
+        .executes(commandContext -> {
+          String ign =  StringArgumentType.getString(commandContext, "ign");
+          String type =  StringArgumentType.getString(commandContext, "type");
+          ShaftParty.shaftPartyMemebers.put(ign, type);
+          clientPrefixedMessage("§aAdded §6%s §ato the shaft party, they are set to mine §6%s".formatted(ign, type));
           return 0;
         }))));
+    }));
+
+    ClientCommandRegistrationCallback.EVENT.register(((commandDispatcher, buildContext) -> {
+      commandDispatcher.register(ClientCommands.literal("removeshaftpartymember")
+        .then(ClientCommands.argument("ign", StringArgumentType.word())
+        .suggests(new ShaftPartyMemberSuggestionProvider())
+        .executes(commandContext -> {
+          String ign =  StringArgumentType.getString(commandContext, "ign");
+          ShaftParty.shaftPartyMemebers.remove(ign);
+          clientPrefixedMessage("§aRemoved §6%s §afrom the shaft party".formatted(ign));
+          return 0;
+        })));
     }));
   }
 }

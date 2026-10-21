@@ -86,6 +86,6 @@ public class SkeletonKeyProfit implements CustomCommand {
       }
     }
     expectedValue = expectedPityValue + expectedValueWithoutPity;
-    clientMessage("§8[§bMisc§dMining§8] §aExpected Skeleton Key Profit: §6%,.2f".formatted(expectedValue-skeleKeyPrice));
+    clientPrefixedMessage("§aExpected Skeleton Key Profit: §6%,.2f".formatted(expectedValue-skeleKeyPrice));
   }
 }
