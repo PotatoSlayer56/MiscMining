@@ -143,7 +143,7 @@ public class MiscMining implements ModInitializer {
 	}
 
 	public static void clientPrefixedMessage(String message) {
-		if (client.player != null) client.player.sendSystemMessage(Component.literal("§8[§bMisc§dMining§8] %s".formatted(message)));
+		if (client.player != null) client.player.sendSystemMessage(Component.literal("§8[§bMisc§dMining§8]§f %s".formatted(message)));
 	}
 
 	public static void sendCommandFromPlayer(String command) {

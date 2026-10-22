@@ -30,7 +30,7 @@ public class ShaftMiningCommand {
     ClientCommandRegistrationCallback.EVENT.register(((commandDispatcher, commandBuildContext) -> {
       commandDispatcher.register(ClientCommands.literal("registershaftpartymember")
         .then(ClientCommands.argument("ign", StringArgumentType.word())
-        .then(ClientCommands.argument("type", StringArgumentType.greedyString())
+        .then(ClientCommands.argument("type", StringArgumentType.word())
         .suggests(new ShaftPartyTypeSuggestionsProvider())
         .executes(commandContext -> {
           String ign =  StringArgumentType.getString(commandContext, "ign");
@@ -46,7 +46,7 @@ public class ShaftMiningCommand {
         .then(ClientCommands.argument("ign", StringArgumentType.word())
         .suggests(new ShaftPartyMemberSuggestionProvider())
         .executes(commandContext -> {
-          String ign =  StringArgumentType.getString(commandContext, "ign");
+          String ign = StringArgumentType.getString(commandContext, "ign");
           ShaftParty.shaftPartyMembers.remove(ign);
           clientPrefixedMessage("§aRemoved §6%s §afrom the shaft party".formatted(ign));
           return 0;

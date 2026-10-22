@@ -49,7 +49,7 @@ public class ChatListenerMixin {
 
       if (inShaftParty) {
         shaftPartyMembers.forEach((member, type) -> {
-          if (type.contains(shaftType)) {
+          if (shaftCategories.get(type).containsKey(shaftType) && getLapisCorpseCount() >= shaftCategories.get(type).get(shaftType)) {
             sendCommandFromPlayer("p %s".formatted(member));
           }
         });

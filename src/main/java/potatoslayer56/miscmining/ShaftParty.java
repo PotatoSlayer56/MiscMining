@@ -2,6 +2,7 @@ package potatoslayer56.miscmining;
 
 import net.hypixel.modapi.HypixelModAPI;
 import net.hypixel.modapi.packet.impl.clientbound.event.ClientboundLocationPacket;
+import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraft.world.scores.Scoreboard;
@@ -10,10 +11,13 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static potatoslayer56.miscmining.MiscMining.*;
 
 public class ShaftParty {
+
+  public static Map<String, Map<String, Integer>> shaftCategories = new HashMap<>();
 
   public static List<String> shaftTypes = List.of(
     "TITA_1",
@@ -54,12 +58,54 @@ public class ShaftParty {
   public static String waitingForJoin = "";
 
   public static void init() {
+    shaftCategories.put("UMBER", new HashMap<>());
+    shaftCategories.get("UMBER").put("UMBE_1", 0);
+    shaftCategories.put("TUNGSTEN", new HashMap<>());
+    shaftCategories.get("TUNGSTEN").put("TUNG_1", 0);
+    shaftCategories.put("HYBRID", new HashMap<>());
+    shaftCategories.get("HYBRID").put("UMBE_1", 0);
+    shaftCategories.get("HYBRID").put("TUNG_1", 0);
+    shaftCategories.put("TITANIUM", new HashMap<>());
+    shaftCategories.get("TITANIUM").put("TITA_1", 0);
+    shaftCategories.put("GEMS", new HashMap<>());
+    shaftCategories.get("GEMS").put("JADE_1", 3);
+    shaftCategories.get("GEMS").put("AMBE_1", 3);
+    shaftCategories.get("GEMS").put("AMET_1", 3);
+    shaftCategories.get("GEMS").put("SAPP_1", 3);
+    shaftCategories.get("GEMS").put("RUBY_1", 3);
+    shaftCategories.get("GEMS").put("RUBY_2", 3);
+    shaftCategories.get("GEMS").put("RUBY_C", 3);
+    shaftCategories.get("GEMS").put("TOPA_1", 4);
+    shaftCategories.get("GEMS").put("JASP_1", 0);
+    shaftCategories.get("GEMS").put("JASP_C", 0);
+    shaftCategories.get("GEMS").put("PERI_1", 3);
+    shaftCategories.get("GEMS").put("PERI_2", 3);
+    shaftCategories.get("GEMS").put("PERI_C", 3);
+    shaftCategories.get("GEMS").put("CITR_1", 4);
+    shaftCategories.get("GEMS").put("CITR_2", 4);
+    shaftCategories.get("GEMS").put("CITR_C", 4);
+    shaftCategories.get("GEMS").put("OPAL_1", 4);
+    shaftCategories.get("GEMS").put("OPAL_2", 4);
+    shaftCategories.get("GEMS").put("OPAL_C", 4);
+    shaftCategories.get("GEMS").put("AQUA_1", 4);
+    shaftCategories.get("GEMS").put("AQUA_2", 4);
+    shaftCategories.get("GEMS").put("AQUA_C", 4);
+    shaftCategories.get("GEMS").put("ONYX_1", 4);
+    shaftCategories.get("GEMS").put("ONYX_2", 4);
+    shaftCategories.get("GEMS").put("ONYX_C", 4);
+  }
 
-    HypixelModAPI.getInstance().createHandler(ClientboundLocationPacket.class, clientboundLocationPacket -> {
-
+  public static int getLapisCorpseCount() {
+    AtomicInteger count = new AtomicInteger();
+    Collection<PlayerInfo> tabList = client.player.connection.getListedOnlinePlayers();
+    tabList.forEach(playerInfo -> {
+      if (playerInfo != null && playerInfo.getTabListDisplayName() != null) {
+        if (playerInfo.getTabListDisplayName().getString().contains("Lapis")) {
+          count.addAndGet(1);
+        }
+      }
     });
-
-    HypixelModAPI.getInstance().subscribeToEventPacket(ClientboundLocationPacket.class);
+    return count.get();
   }
 
   public static String getPlayerShaftType() {

@@ -8,26 +8,12 @@ import potatoslayer56.miscmining.commands.CustomCommand;
 import java.util.Collection;
 
 import static potatoslayer56.miscmining.MiscMining.client;
+import static potatoslayer56.miscmining.MiscMining.clientPrefixedMessage;
+import static potatoslayer56.miscmining.ShaftParty.getLapisCorpseCount;
 
 public class Dev implements CustomCommand {
   @Override
   public void execute() {
-    Scoreboard scoreboard = client.level.getScoreboard();
-
-    Collection<PlayerTeam> playerTeams = scoreboard.getPlayerTeams();
-
-    StringBuilder scoreboardTextBuilder = new StringBuilder();
-
-    playerTeams.forEach(playerTeam -> {
-      Component prefix = playerTeam.getPlayerPrefix();
-      Component suffix = playerTeam.getPlayerSuffix();
-      client.player.sendSystemMessage(prefix);
-      client.player.sendSystemMessage(suffix);
-
-      scoreboardTextBuilder.append(prefix.getString());
-      scoreboardTextBuilder.append(suffix.getString());
-    });
-
-    String scoreboardText = scoreboardTextBuilder.toString();
+    clientPrefixedMessage(String.valueOf(getLapisCorpseCount()));
   }
 }

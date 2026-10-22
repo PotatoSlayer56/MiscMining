@@ -10,10 +10,15 @@ import potatoslayer56.miscmining.ShaftParty;
 
 import java.util.concurrent.CompletableFuture;
 
+import static potatoslayer56.miscmining.ShaftParty.shaftCategories;
+import static potatoslayer56.miscmining.ShaftParty.shaftTypes;
+
 public class ShaftPartyTypeSuggestionsProvider implements SuggestionProvider<FabricClientCommandSource> {
   @Override
   public CompletableFuture<Suggestions> getSuggestions(CommandContext<FabricClientCommandSource> commandContext, SuggestionsBuilder suggestionsBuilder) throws CommandSyntaxException {
-    ShaftParty.shaftTypes.forEach(suggestionsBuilder::suggest);
+    shaftCategories.forEach((type, category) -> {
+      suggestionsBuilder.suggest(type);
+    });
     return suggestionsBuilder.buildFuture();
   }
 }
