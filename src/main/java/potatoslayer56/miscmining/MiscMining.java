@@ -2,8 +2,6 @@ package potatoslayer56.miscmining;
 
 import net.fabricmc.api.ModInitializer;
 
-import net.hypixel.modapi.HypixelModAPI;
-import net.hypixel.modapi.packet.impl.clientbound.event.ClientboundLocationPacket;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;

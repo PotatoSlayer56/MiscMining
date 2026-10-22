@@ -16,7 +16,7 @@ public class ShaftMiningCommand {
         .executes(commandContext -> {
           ShaftParty.inShaftParty = !ShaftParty.inShaftParty;
           if (!ShaftParty.inShaftParty) {
-              ShaftParty.shaftPartyMemebers = new HashMap<>();
+              ShaftParty.shaftPartyMembers = new HashMap<>();
               ShaftParty.waitingForJoin = "";
               clientPrefixedMessage("§aDisbanded shaft party");
           }
@@ -35,7 +35,7 @@ public class ShaftMiningCommand {
         .executes(commandContext -> {
           String ign =  StringArgumentType.getString(commandContext, "ign");
           String type =  StringArgumentType.getString(commandContext, "type");
-          ShaftParty.shaftPartyMemebers.put(ign, type);
+          ShaftParty.shaftPartyMembers.put(ign, type);
           clientPrefixedMessage("§aAdded §6%s §ato the shaft party, they are set to mine §6%s".formatted(ign, type));
           return 0;
         }))));
@@ -47,7 +47,7 @@ public class ShaftMiningCommand {
         .suggests(new ShaftPartyMemberSuggestionProvider())
         .executes(commandContext -> {
           String ign =  StringArgumentType.getString(commandContext, "ign");
-          ShaftParty.shaftPartyMemebers.remove(ign);
+          ShaftParty.shaftPartyMembers.remove(ign);
           clientPrefixedMessage("§aRemoved §6%s §afrom the shaft party".formatted(ign));
           return 0;
         })));

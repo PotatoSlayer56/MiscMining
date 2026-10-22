@@ -49,24 +49,14 @@ public class ShaftParty {
 
   public static boolean inShaftParty = false;
   public static String shaftType = "N/A";
-  public static Map<String, String> shaftPartyMemebers = new HashMap<>();
+  public static Map<String, String> shaftPartyMembers = new HashMap<>();
 
   public static String waitingForJoin = "";
 
   public static void init() {
 
     HypixelModAPI.getInstance().createHandler(ClientboundLocationPacket.class, clientboundLocationPacket -> {
-      shaftType = getPlayerShaftType();
 
-      clientMessage(shaftType);
-
-      if (inShaftParty) {
-        shaftPartyMemebers.forEach((member, type) -> {
-          if (type.contains(shaftType)) {
-            sendCommandFromPlayer("p %s".formatted(member));
-          }
-        });
-      }
     });
 
     HypixelModAPI.getInstance().subscribeToEventPacket(ClientboundLocationPacket.class);
@@ -82,8 +72,6 @@ public class ShaftParty {
     playerTeams.forEach(playerTeam -> {
       Component prefix = playerTeam.getPlayerPrefix();
       Component suffix = playerTeam.getPlayerSuffix();
-      client.player.sendSystemMessage(prefix);
-      client.player.sendSystemMessage(suffix);
 
       scoreboardTextBuilder.append(prefix.getString());
       scoreboardTextBuilder.append(suffix.getString());

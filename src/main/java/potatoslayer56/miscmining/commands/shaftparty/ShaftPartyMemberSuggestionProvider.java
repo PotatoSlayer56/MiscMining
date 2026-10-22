@@ -13,7 +13,7 @@ import java.util.concurrent.CompletableFuture;
 public class ShaftPartyMemberSuggestionProvider implements SuggestionProvider<FabricClientCommandSource> {
   @Override
   public CompletableFuture<Suggestions> getSuggestions(CommandContext<FabricClientCommandSource> commandContext, SuggestionsBuilder suggestionsBuilder) throws CommandSyntaxException {
-    ShaftParty.shaftPartyMemebers.forEach((member, type) -> {
+    ShaftParty.shaftPartyMembers.forEach((member, type) -> {
       suggestionsBuilder.suggest(member);
     });
     return suggestionsBuilder.buildFuture();
