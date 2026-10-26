@@ -25,7 +25,7 @@ public class ChatListenerMixin {
 
   @Inject(method="handleSystemMessage", at = @At("TAIL"))
   private void disbandAfterShaftWarp(Component message, boolean remote, CallbackInfo ci) {
-    if (!Objects.equals(ShaftParty.waitingForJoin, "") && message.getString().contains("has entered the mineshaft")) {
+    if (!Objects.equals(ShaftParty.waitingForJoin, "") && message.getString().contains("entered the mineshaft")) {
       sendCommandFromPlayer("p disband");
       ShaftParty.waitingForJoin = "";
     }
@@ -51,6 +51,7 @@ public class ChatListenerMixin {
         shaftPartyMembers.forEach((member, type) -> {
           if (shaftCategories.get(type).containsKey(shaftType) && getLapisCorpseCount() >= shaftCategories.get(type).get(shaftType)) {
             sendCommandFromPlayer("p %s".formatted(member));
+            waitingForJoin = member;
           }
         });
       }

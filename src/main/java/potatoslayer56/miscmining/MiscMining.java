@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import potatoslayer56.miscmining.commands.*;
 import potatoslayer56.miscmining.commands.maincommand.*;
 import potatoslayer56.miscmining.commands.shaftparty.ShaftMiningCommand;
+import potatoslayer56.miscmining.config.Variables;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -56,10 +57,13 @@ public class MiscMining implements ModInitializer {
 			MiscMining.LOGGER.error("Failed to fetch bazaar products");
 		}
 
+		Variables.shaftLapisCounts = Variables.defaultLapisCountsConfig();
+
 		registerSubCommand("metalprices", new MetalPrices());
 		registerSubCommand("skeletonkeyprofit", new SkeletonKeyProfit());
 		registerSubCommand("refreshprices", new RefreshPrices());
 		registerSubCommand("dev", new Dev());
+		registerSubCommand("config", new ConfigSubcommand());
 
 		MainCommand.register();
 		ShaftParty.init();
