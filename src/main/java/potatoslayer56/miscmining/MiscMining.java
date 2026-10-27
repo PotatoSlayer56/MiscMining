@@ -1,7 +1,11 @@
 package potatoslayer56.miscmining;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.api.ModInitializer;
 
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -15,7 +19,9 @@ import org.slf4j.LoggerFactory;
 import potatoslayer56.miscmining.commands.*;
 import potatoslayer56.miscmining.commands.maincommand.*;
 import potatoslayer56.miscmining.commands.shaftparty.ShaftMiningCommand;
+import potatoslayer56.miscmining.config.SaveLoad;
 import potatoslayer56.miscmining.config.Variables;
+import potatoslayer56.miscmining.config.screen.LapisCorpseCountConfigScreen;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -26,135 +32,135 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MiscMining implements ModInitializer {
-	public static final String MOD_ID = "misc-mining";
+  public static final String MOD_ID = "misc-mining";
 
-	public static JSONObject bazaarData;
-	public static JSONObject bazaarProducts;
+  public static JSONObject bazaarData;
+  public static JSONObject bazaarProducts;
 
-	public static float locketPrice;
-	public static float wispPrice;
-	public static float frostDyePrice;
+  public static float locketPrice;
+  public static float wispPrice;
+  public static float frostDyePrice;
 
-	public static Minecraft client;
+  public static Minecraft client;
 
-	public static Map<String, CustomCommand> subCommands = new HashMap<>();
+  public static Map<String, CustomCommand> subCommands = new HashMap<>();
 
 
-	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
+  public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
-	@Override
-	public void onInitialize() {
-		client = Minecraft.getInstance();
+  @Override
+  public void onInitialize() {
+    client = Minecraft.getInstance();
 
-		locketPrice = getLowestBin("SHATTERED_PENDANT");
-		wispPrice = getLowestBin("CAGED_WISP");
-		frostDyePrice = getLowestBin("DYE_FROSTBITTEN");
+    locketPrice = getLowestBin("SHATTERED_PENDANT");
+    wispPrice = getLowestBin("CAGED_WISP");
+    frostDyePrice = getLowestBin("DYE_FROSTBITTEN");
 
-		try {
-			bazaarData = new JSONObject(getBazaarData());
-			bazaarProducts = bazaarData.getJSONObject("products");
-		} catch (JSONException e) {
-			MiscMining.LOGGER.error("Failed to fetch bazaar products");
-		}
+    try {
+      //bazaarData = new JSONObject(getBazaarData());
+      //bazaarProducts = bazaarData.getJSONObject("products");
+    } catch (JSONException e) {
+      MiscMining.LOGGER.error("Failed to fetch bazaar products");
+    }
 
-		Variables.shaftLapisCounts = Variables.defaultLapisCountsConfig();
+    registerSubCommand("metalprices", new MetalPrices());
+    registerSubCommand("skeletonkeyprofit", new SkeletonKeyProfit());
+    registerSubCommand("refreshprices", new RefreshPrices());
+    //registerSubCommand("dev", new Dev());
+    registerSubCommand("config", new ConfigSubcommand());
 
-		registerSubCommand("metalprices", new MetalPrices());
-		registerSubCommand("skeletonkeyprofit", new SkeletonKeyProfit());
-		registerSubCommand("refreshprices", new RefreshPrices());
-		registerSubCommand("dev", new Dev());
-		registerSubCommand("config", new ConfigSubcommand());
+    MainCommand.register();
+    ShaftParty.init();
+    ShaftMiningCommand.register();
 
-		MainCommand.register();
-		ShaftParty.init();
-		ShaftMiningCommand.register();
-	}
+    SaveLoad.load();
+  }
 
-	public static Identifier id(String path) {
-		return Identifier.fromNamespaceAndPath(MOD_ID, path);
-	}
+  public static Identifier id(String path) {
+    return Identifier.fromNamespaceAndPath(MOD_ID, path);
+  }
 
-	public static String getBazaarData(){
-		MiscMining.LOGGER.info("Fetching bazaar prices");
-		String fullJsonString = "";
-		try {
-			URL url = new URL("https://api.hypixel.net/v2/skyblock/bazaar");
-			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-			connection.setRequestMethod("GET");
-			// Read the response
-			BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-			String line;
-			while ((line = in.readLine()) != null) {
-				fullJsonString += line;
-			}
-			in.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return fullJsonString;
-	}
+  public static String getBazaarData(){
+    MiscMining.LOGGER.info("Fetching bazaar prices");
+    String fullJsonString = "";
+    try {
+      URL url = new URL("https://api.hypixel.net/v2/skyblock/bazaar");
+      HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+      connection.setRequestMethod("GET");
+      // Read the response
+      BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+      String line;
+      while ((line = in.readLine()) != null) {
+        fullJsonString += line;
+      }
+      in.close();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return fullJsonString;
+  }
 
-	public static float getLowestBin(String productID){
-		String fullJsonString = "";
-		try {
-			URL url = new URL("https://sky.coflnet.com/api/auctions/tag/%s/active/bin".formatted(productID));
-				HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-			connection.setRequestMethod("GET");
+  public static float getLowestBin(String productID){
+    String fullJsonString = "";
+    try {
+      URL url = new URL("https://sky.coflnet.com/api/auctions/tag/%s/active/bin".formatted(productID));
+      HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+      connection.setRequestMethod("GET");
 
-			// Read the response
-			BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+      // Read the response
+      BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 
-			String line;
-			while ((line = in.readLine()) != null) {
-				fullJsonString += line;
-			}
-			in.close();
+      String line;
+      while ((line = in.readLine()) != null) {
+        fullJsonString += line;
+      }
+      in.close();
 
-			JSONArray lbinData = new JSONArray(fullJsonString);
+      JSONArray lbinData = new JSONArray(fullJsonString);
 
-			return lbinData.getJSONObject(0).getFloat("startingBid");
+      return lbinData.getJSONObject(0).getFloat("startingBid");
 
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
 
-		return 0;
+    return 0;
 
-	}
+  }
 
-	public static float getInstaBuy(String productID) {
-		try {
-			BigDecimal price = (BigDecimal) bazaarProducts.getJSONObject(productID).getJSONObject("quick_status").get("buyPrice");
-			return price.floatValue();
-		} catch (JSONException e) {
-			MiscMining.LOGGER.error("Failed to fetch price for %s".formatted(productID));
-			return 0;
-		}
-	}
+  public static float getInstaBuy(String productID) {
+    try {
+      BigDecimal price = (BigDecimal) bazaarProducts.getJSONObject(productID).getJSONObject("quick_status").get("buyPrice");
+      return price.floatValue();
+    } catch (JSONException e) {
+      MiscMining.LOGGER.error("Failed to fetch price for %s".formatted(productID));
+      return 0;
+    }
+  }
 
-	public static float getInstaSell(String productID) {
-		try {
-			BigDecimal price = (BigDecimal) bazaarProducts.getJSONObject(productID).getJSONObject("quick_status").get("sellPrice");
-			return price.floatValue();
-		} catch (JSONException e) {
-			MiscMining.LOGGER.error("Failed to fetch price for %s".formatted(productID));
-			return 0;
-		}
-	}
+  public static float getInstaSell(String productID) {
+    try {
+      BigDecimal price = (BigDecimal) bazaarProducts.getJSONObject(productID).getJSONObject("quick_status").get("sellPrice");
+      return price.floatValue();
+    } catch (JSONException e) {
+      MiscMining.LOGGER.error("Failed to fetch price for %s".formatted(productID));
+      return 0;
+    }
+  }
 
-	public static void clientMessage(String message) {
-		if (client.player != null) client.player.sendSystemMessage(Component.literal(message));
-	}
+  public static void clientMessage(String message) {
+    if (client.player != null) client.player.sendSystemMessage(Component.literal(message));
+  }
 
-	public static void clientPrefixedMessage(String message) {
-		if (client.player != null) client.player.sendSystemMessage(Component.literal("§8[§bMisc§dMining§8]§f %s".formatted(message)));
-	}
+  public static void clientPrefixedMessage(String message) {
+    if (client.player != null) client.player.sendSystemMessage(Component.literal("§8[§bMisc§dMining§8]§f %s".formatted(message)));
+  }
 
-	public static void sendCommandFromPlayer(String command) {
-		if (client.player != null) client.player.connection.sendCommand(command);
-	}
+  public static void sendCommandFromPlayer(String command) {
+    if (client.player != null) client.player.connection.sendCommand(command);
+  }
 
-	public static void registerSubCommand(String name, CustomCommand command) {
-		subCommands.put(name, command);
-	}
+  public static void registerSubCommand(String name, CustomCommand command) {
+    subCommands.put(name, command);
+  }
 }

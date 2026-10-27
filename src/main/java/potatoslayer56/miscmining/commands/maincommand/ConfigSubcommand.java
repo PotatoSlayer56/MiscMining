@@ -9,9 +9,8 @@ import static potatoslayer56.miscmining.MiscMining.clientMessage;
 public class ConfigSubcommand implements CustomCommand {
   @Override
   public void execute() {
-    clientMessage(Minecraft.getInstance().gui.screen().getTitle().getString());
-    Minecraft.getInstance().gui.setScreen(new LapisCorpseCountConfigScreen(null));
-    clientMessage(Minecraft.getInstance().gui.screen().getTitle().getString());
-    clientMessage("config");
+    Minecraft.getInstance().execute(() -> {
+      Minecraft.getInstance().gui.setScreen(new LapisCorpseCountConfigScreen(Minecraft.getInstance().gui.screen()));
+    });
   }
 }
