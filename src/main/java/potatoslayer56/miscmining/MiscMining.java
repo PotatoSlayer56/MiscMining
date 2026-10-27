@@ -57,8 +57,8 @@ public class MiscMining implements ModInitializer {
     frostDyePrice = getLowestBin("DYE_FROSTBITTEN");
 
     try {
-      //bazaarData = new JSONObject(getBazaarData());
-      //bazaarProducts = bazaarData.getJSONObject("products");
+      bazaarData = new JSONObject(getBazaarData());
+      bazaarProducts = bazaarData.getJSONObject("products");
     } catch (JSONException e) {
       MiscMining.LOGGER.error("Failed to fetch bazaar products");
     }
