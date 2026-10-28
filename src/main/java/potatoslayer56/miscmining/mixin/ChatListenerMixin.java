@@ -1,5 +1,7 @@
 package potatoslayer56.miscmining.mixin;
 
+import net.hypixel.modapi.HypixelModAPI;
+import net.hypixel.modapi.packet.impl.serverbound.ServerboundPartyInfoPacket;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.chat.ChatListener;
 import net.minecraft.network.chat.Component;
@@ -50,7 +52,17 @@ public class ChatListenerMixin {
     if (inShaftParty) {
       ShaftParty.shaftPartyMembers.forEach((member, type) -> {
         if (message.getString().contains(member) && message.getString().contains("you to join their party")) {
-          sendCommandFromPlayer("p %s".formatted(member));
+          HypixelModAPI.getInstance().sendPacket(new ServerboundPartyInfoPacket());
+          if (isInOtherParty) {
+            ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+            sendCommandFromPlayer("pc !reinvite");
+            scheduler.schedule(() -> { sendCommandFromPlayer("p leave"); },1000L, TimeUnit.MILLISECONDS);
+            scheduler.schedule(() -> { sendCommandFromPlayer("p %s".formatted(member)); },2000L, TimeUnit.MILLISECONDS);
+            scheduler.shutdown();
+          }
+          else {
+            sendCommandFromPlayer("p %s".formatted(member));
+          }
         }
       });
     }
@@ -59,6 +71,7 @@ public class ChatListenerMixin {
   @Inject(method="handleSystemMessage", at = @At("TAIL"))
   private void shaftDetection(Component message, boolean remote, CallbackInfo ci) {
     if (message.getString().startsWith("§aYou are playing on profile:")) {
+      HypixelModAPI.getInstance().sendPacket(new ServerboundPartyInfoPacket());
       shaftType = getPlayerShaftType();
 
       if (inShaftParty) {
@@ -73,6 +86,7 @@ public class ChatListenerMixin {
             x.addAndGet(1);
           }
         });
+        scheduler.shutdown();
       } else if (inLapisParty && getLapisCorpseCount() >= 2) {
         sendCommandFromPlayer("pc !pt");
         waitingForPartyTransfer = true;

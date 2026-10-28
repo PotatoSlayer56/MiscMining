@@ -1,7 +1,9 @@
 package potatoslayer56.miscmining;
 
 import net.hypixel.modapi.HypixelModAPI;
+import net.hypixel.modapi.packet.impl.clientbound.ClientboundPartyInfoPacket;
 import net.hypixel.modapi.packet.impl.clientbound.event.ClientboundLocationPacket;
+import net.hypixel.modapi.packet.impl.serverbound.ServerboundPartyInfoPacket;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.scores.PlayerTeam;
@@ -52,6 +54,7 @@ public class ShaftParty {
   public static boolean inShaftParty = false;
   public static String shaftType = "N/A";
   public static Map<String, String> shaftPartyMembers = new HashMap<>();
+  public static boolean isInOtherParty = false;
 
   public static List<String> waitingForJoin = List.of();
 
@@ -76,6 +79,10 @@ public class ShaftParty {
     shaftCategories.put("2L+", new HashMap<>());;
     shaftTypes.forEach(type -> {
       shaftCategories.get("2L+").put(type, 2);
+    });
+
+    HypixelModAPI.getInstance().createHandler(ClientboundPartyInfoPacket.class, clientBoundPartyInfoPacket -> {
+      isInOtherParty = clientBoundPartyInfoPacket.isInParty();
     });
   }
 
