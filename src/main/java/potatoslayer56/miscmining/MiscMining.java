@@ -1,11 +1,7 @@
 package potatoslayer56.miscmining;
 
-import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.api.ModInitializer;
 
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
-import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -20,10 +16,9 @@ import potatoslayer56.miscmining.commands.*;
 import potatoslayer56.miscmining.commands.maincommand.*;
 import potatoslayer56.miscmining.commands.shaftparty.ShaftMiningCommand;
 import potatoslayer56.miscmining.config.SaveLoad;
-import potatoslayer56.miscmining.config.Variables;
-import potatoslayer56.miscmining.config.screen.LapisCorpseCountConfigScreen;
 
 import java.io.BufferedReader;
+
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.net.HttpURLConnection;
@@ -68,6 +63,7 @@ public class MiscMining implements ModInitializer {
     registerSubCommand("refreshprices", new RefreshPrices());
     //registerSubCommand("dev", new Dev());
     registerSubCommand("config", new ConfigSubcommand());
+    registerSubCommand("togglelapisparty", new ToggleLapisParty());
 
     MainCommand.register();
     ShaftParty.init();

@@ -1,5 +1,6 @@
 package potatoslayer56.miscmining.mixin;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.chat.ChatListener;
 import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Mixin;
@@ -8,13 +9,13 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import potatoslayer56.miscmining.ShaftParty;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import static potatoslayer56.miscmining.MiscMining.*;
 import static potatoslayer56.miscmining.ShaftParty.*;
+import static potatoslayer56.miscmining.LapisParty.*;
 
 @Mixin(ChatListener.class)
 public class ChatListenerMixin {
@@ -60,21 +61,26 @@ public class ChatListenerMixin {
       shaftType = getPlayerShaftType();
 
       if (inShaftParty) {
-        Thread.startVirtualThread(() -> {
-          shaftPartyMembers.forEach((member, type) -> {
-            if (shaftCategories.get(type).containsKey(shaftType) && getLapisCorpseCount() >= shaftCategories.get(type).get(shaftType)) {
+        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+        shaftPartyMembers.forEach((member, type) -> {
+          if (shaftCategories.get(type).containsKey(shaftType) && getLapisCorpseCount() >= shaftCategories.get(type).get(shaftType)) {
+            scheduler.schedule(() -> {
               sendCommandFromPlayer("p %s".formatted(member));
               waitingForJoin.add(member);
-              try {
-                Thread.sleep(1000);
-              } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                clientPrefixedMessage("Something went wrong!");
-              }
-            }
-          });
+            }, 500 * waitingForJoin.size(), TimeUnit.MILLISECONDS);
+          }
         });
+      } else if (inLapisParty && getLapisCorpseCount() >= 2) {
+        sendCommandFromPlayer("pc !pt");
+        waitingForPartyTransfer = true;
       }
+    }
+  }
+
+  @Inject(method="handleSystemMessage", at = @At("TAIL"))
+  private void autoWarpLapisParty(Component message, boolean remote, CallbackInfo ci) {
+    if (inLapisParty && message.getString().contains("The party was transferred to") && message.getString().contains(Minecraft.getInstance().player.nameAndId().name())) {
+      sendCommandFromPlayer("p warp");
     }
   }
 }
