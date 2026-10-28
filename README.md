@@ -1,6 +1,6 @@
 # Misc Mining
 ### A small mod for Hypixel Skyblock that adds some features I like
-
+![Modrinth Downloads](https://img.shields.io/modrinth/dt/qYu3vA2S?logo=modrinth) ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/PotatoSlayer56/MiscMining/total?logo=github)
 ## Features
 - Corpse Key Estimated Profit - Calculates the expected return for a corpse key including pity, assuming maxed extra item chances.
 - Metal Prices - Shows what each form of Umber/Tungsten sells for and how much value you get
