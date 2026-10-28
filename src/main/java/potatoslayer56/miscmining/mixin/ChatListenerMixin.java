@@ -12,6 +12,7 @@ import potatoslayer56.miscmining.ShaftParty;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static potatoslayer56.miscmining.MiscMining.*;
 import static potatoslayer56.miscmining.ShaftParty.*;
@@ -62,12 +63,14 @@ public class ChatListenerMixin {
 
       if (inShaftParty) {
         ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+        AtomicInteger x = new AtomicInteger();
         shaftPartyMembers.forEach((member, type) -> {
           if (shaftCategories.get(type).containsKey(shaftType) && getLapisCorpseCount() >= shaftCategories.get(type).get(shaftType)) {
             scheduler.schedule(() -> {
               sendCommandFromPlayer("p %s".formatted(member));
               waitingForJoin.add(member);
-            }, 500 * waitingForJoin.size(), TimeUnit.MILLISECONDS);
+            }, 1000L * x.get(), TimeUnit.MILLISECONDS);
+            x.addAndGet(1);
           }
         });
       } else if (inLapisParty && getLapisCorpseCount() >= 2) {
