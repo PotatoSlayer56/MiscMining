@@ -6,7 +6,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 
-import net.minecraft.world.scores.*;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -59,7 +58,7 @@ public class MiscMining implements ModInitializer {
     }
 
     registerSubCommand("metalprices", new MetalPrices());
-    registerSubCommand("skeletonkeyprofit", new SkeletonKeyProfit());
+    registerSubCommand("corpsekeyprofit", new CorpseKeyProfit());
     registerSubCommand("refreshprices", new RefreshPrices());
     //registerSubCommand("dev", new Dev());
     registerSubCommand("config", new ConfigSubcommand());

@@ -2,15 +2,20 @@
 ### A small mod for Hypixel Skyblock that adds some features I like
 
 ## Features
-- Skeleton Key Estimated Profit - Calculates the expected return for a skeleton key including pity, assuming maxed extra item chances.
+- Corpse Key Estimated Profit - Calculates the expected return for a corpse key including pity, assuming maxed extra item chances.
 - Metal Prices - Shows what each form of Umber/Tungsten sells for and how much value you get
 - Shaft Parties - Creates a shaft party that others can be added to and will automatically warp them into specified shafts!
+- Lapis Parties - Toggle this on and the mod will automatically warp your party into shafts!
 
 ## Commands
 - `/miscmining <subcommand>` this holds all non shaft party commands
 - `/toggleshaftparty` creates/disbands a shaft party
 - `/registershaftpartymember` adds a player to your shaft party
 - `/removeshaftpartymember` removes a player from your shaft party
+
+### How to lapis party
+- Toggle it on with `/miscmining togglelapisparty`
+- Mine! Whenever you enter a shaft that is 2l+ it will send `!pt` in party chat then warp the party
 
 ### How to shaft party - All players in party must do this
 - Disable profile type chat filtering in SkyHanni, as this will not function without it
