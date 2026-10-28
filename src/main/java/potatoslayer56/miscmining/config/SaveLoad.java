@@ -48,7 +48,9 @@ public class SaveLoad {
       });
 
     } catch (Exception e) {
-      throw new RuntimeException(e);
+      MiscMining.LOGGER.info("Missing config file");
+      Variables.shaftLapisCounts = Variables.defaultLapisCountsConfig();
+      save();
     }
   }
 }

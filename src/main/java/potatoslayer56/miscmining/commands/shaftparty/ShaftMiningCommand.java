@@ -6,6 +6,7 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommands;
 import potatoslayer56.miscmining.ShaftParty;
 
 import java.util.HashMap;
+import java.util.List;
 
 import static potatoslayer56.miscmining.MiscMining.clientPrefixedMessage;
 
@@ -17,7 +18,7 @@ public class ShaftMiningCommand {
           ShaftParty.inShaftParty = !ShaftParty.inShaftParty;
           if (!ShaftParty.inShaftParty) {
               ShaftParty.shaftPartyMembers = new HashMap<>();
-              ShaftParty.waitingForJoin = "";
+              ShaftParty.waitingForJoin = List.of();
               clientPrefixedMessage("§aDisbanded shaft party");
           }
           else {

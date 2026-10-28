@@ -8,10 +8,7 @@ import net.minecraft.world.scores.PlayerTeam;
 import net.minecraft.world.scores.Scoreboard;
 import potatoslayer56.miscmining.config.Variables;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static potatoslayer56.miscmining.MiscMining.*;
@@ -56,7 +53,7 @@ public class ShaftParty {
   public static String shaftType = "N/A";
   public static Map<String, String> shaftPartyMembers = new HashMap<>();
 
-  public static String waitingForJoin = "";
+  public static List<String> waitingForJoin = List.of();
 
   public static void init() {
     shaftCategories.put("UMBER", new HashMap<>());
@@ -71,6 +68,14 @@ public class ShaftParty {
     shaftCategories.put("GEMS", new HashMap<>());
     Variables.shaftLapisCounts.forEach((type, count) -> {
       shaftCategories.get("GEMS").put(type, count);
+    });
+    shaftCategories.put("1L+", new HashMap<>());
+    shaftTypes.forEach(type -> {
+      shaftCategories.get("1L+").put(type, 1);
+    });
+    shaftCategories.put("2L+", new HashMap<>());;
+    shaftTypes.forEach(type -> {
+      shaftCategories.get("2L+").put(type, 2);
     });
   }
 

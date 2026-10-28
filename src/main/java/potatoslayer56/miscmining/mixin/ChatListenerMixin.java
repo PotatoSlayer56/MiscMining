@@ -8,26 +8,38 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import potatoslayer56.miscmining.ShaftParty;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
-import static potatoslayer56.miscmining.MiscMining.clientMessage;
-import static potatoslayer56.miscmining.MiscMining.sendCommandFromPlayer;
+import static potatoslayer56.miscmining.MiscMining.*;
 import static potatoslayer56.miscmining.ShaftParty.*;
 
 @Mixin(ChatListener.class)
 public class ChatListenerMixin {
   @Inject(method="handleSystemMessage", at = @At("TAIL"))
   private void shaftWarp(Component message, boolean remote, CallbackInfo ci) {
-    if (!Objects.equals(ShaftParty.waitingForJoin, "") && message.getString().contains(ShaftParty.waitingForJoin) && message.getString().contains("joined the party")) {
-      sendCommandFromPlayer("p warp");
+    if (!waitingForJoin.isEmpty() && message.getString().contains("joined the party")) {
+      waitingForJoin.forEach(ign -> {
+        if (message.getString().contains(ign)) {
+          sendCommandFromPlayer("p warp");
+        }
+      });
     }
   }
 
   @Inject(method="handleSystemMessage", at = @At("TAIL"))
   private void disbandAfterShaftWarp(Component message, boolean remote, CallbackInfo ci) {
-    if (!Objects.equals(ShaftParty.waitingForJoin, "") && message.getString().contains("entered the mineshaft")) {
-      sendCommandFromPlayer("p disband");
-      ShaftParty.waitingForJoin = "";
+    if (!waitingForJoin.isEmpty() && message.getString().contains("entered the mineshaft")) {
+      waitingForJoin.forEach(ign -> {
+        if (message.getString().contains(ign)) {
+          waitingForJoin.remove(ign);
+        }
+        if (waitingForJoin.isEmpty()) {
+          sendCommandFromPlayer("p disband");
+        }
+      });
     }
   }
 
@@ -48,11 +60,19 @@ public class ChatListenerMixin {
       shaftType = getPlayerShaftType();
 
       if (inShaftParty) {
-        shaftPartyMembers.forEach((member, type) -> {
-          if (shaftCategories.get(type).containsKey(shaftType) && getLapisCorpseCount() >= shaftCategories.get(type).get(shaftType)) {
-            sendCommandFromPlayer("p %s".formatted(member));
-            waitingForJoin = member;
-          }
+        Thread.startVirtualThread(() -> {
+          shaftPartyMembers.forEach((member, type) -> {
+            if (shaftCategories.get(type).containsKey(shaftType) && getLapisCorpseCount() >= shaftCategories.get(type).get(shaftType)) {
+              sendCommandFromPlayer("p %s".formatted(member));
+              waitingForJoin.add(member);
+              try {
+                Thread.sleep(1000);
+              } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                clientPrefixedMessage("Something went wrong!");
+              }
+            }
+          });
         });
       }
     }
