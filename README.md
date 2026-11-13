@@ -6,6 +6,7 @@
 - Metal Prices - Shows what each form of Umber/Tungsten sells for and how much value you get
 - Shaft Parties - Creates a shaft party that others can be added to and will automatically warp them into specified shafts!
 - Lapis Parties - Toggle this on and the mod will automatically warp your party into shafts!
+- Jungle Cheese - Posts jungle temple cheese coordinated in party chat, auto waypoint parser recommended
 
 ## Commands
 - `/miscmining <subcommand>` this holds all non shaft party commands
