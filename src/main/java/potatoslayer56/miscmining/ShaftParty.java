@@ -80,10 +80,6 @@ public class ShaftParty {
     shaftTypes.forEach(type -> {
       shaftCategories.get("2L+").put(type, 2);
     });
-
-    HypixelModAPI.getInstance().createHandler(ClientboundPartyInfoPacket.class, clientBoundPartyInfoPacket -> {
-      isInOtherParty = clientBoundPartyInfoPacket.isInParty();
-    });
   }
 
   public static int getLapisCorpseCount() {

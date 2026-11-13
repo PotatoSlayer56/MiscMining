@@ -2,6 +2,8 @@ package potatoslayer56.miscmining;
 
 import net.fabricmc.api.ModInitializer;
 
+import net.hypixel.modapi.HypixelModAPI;
+import net.hypixel.modapi.packet.impl.clientbound.ClientboundPartyInfoPacket;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -15,6 +17,7 @@ import potatoslayer56.miscmining.commands.*;
 import potatoslayer56.miscmining.commands.maincommand.*;
 import potatoslayer56.miscmining.commands.shaftparty.ShaftMiningCommand;
 import potatoslayer56.miscmining.config.SaveLoad;
+import potatoslayer56.miscmining.partyfinder.PartyFinder;
 
 import java.io.BufferedReader;
 
@@ -22,7 +25,9 @@ import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class MiscMining implements ModInitializer {
@@ -38,7 +43,6 @@ public class MiscMining implements ModInitializer {
   public static Minecraft client;
 
   public static Map<String, CustomCommand> subCommands = new HashMap<>();
-
 
   public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
@@ -57,9 +61,29 @@ public class MiscMining implements ModInitializer {
       MiscMining.LOGGER.error("Failed to fetch bazaar products");
     }
 
+    HypixelModAPI.getInstance().createHandler(ClientboundPartyInfoPacket.class, clientBoundPartyInfoPacket -> {
+      ShaftParty.isInOtherParty = clientBoundPartyInfoPacket.isInParty();
+      if(clientBoundPartyInfoPacket.isInParty()){
+        PartyFinder.partySize = clientBoundPartyInfoPacket.getMemberMap().size();
+        PartyFinder.partyMembers = new ArrayList<>();
+        clientBoundPartyInfoPacket.getMemberMap().forEach((uuid, partyMember) -> {
+          String username = Minecraft.getInstance().getConnection().getPlayerInfo(uuid).getProfile().name();
+          PartyFinder.partyMembers.add(List.of(username, username));
+          if (Minecraft.getInstance().getConnection().getPlayerInfo(uuid) == null){
+            PartyFinder.partyMembers.add(List.of(Minecraft.getInstance().player.getPlainTextName(), Minecraft.getInstance().player.getPlainTextName()));
+          }
+        });
+        if (PartyFinder.partySize >= 4){
+          PartyFinder.unregisterParty(PartyFinder.currentPartyID);
+        }
+      }
+    });
+
     registerSubCommand("metalprices", new MetalPrices());
     registerSubCommand("corpsekeyprofit", new CorpseKeyProfit());
     registerSubCommand("refreshprices", new RefreshPrices());
+    //registerSubCommand("partyfinder", new PartyFinderCommand());
+    registerSubCommand("junglecheese", new JungleCheese());
     //registerSubCommand("dev", new Dev());
     registerSubCommand("config", new ConfigSubcommand());
     registerSubCommand("togglelapisparty", new ToggleLapisParty());
@@ -67,6 +91,7 @@ public class MiscMining implements ModInitializer {
     MainCommand.register();
     ShaftParty.init();
     ShaftMiningCommand.register();
+    PartyFinder.init();
 
     SaveLoad.load();
   }
@@ -120,7 +145,6 @@ public class MiscMining implements ModInitializer {
     }
 
     return 0;
-
   }
 
   public static float getInstaBuy(String productID) {

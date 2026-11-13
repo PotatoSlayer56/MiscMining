@@ -61,7 +61,7 @@ public class LapisCorpseCountConfigScreen extends Screen {
           y.get(),
           25,
           16,
-          Component.literal("1")
+          Component.literal("")
         )
       );
       widgets.get(type).forEach((label, editBox) -> {
