@@ -3,7 +3,8 @@
   "package": "potatoslayer56.miscmining.mixin",
   "compatibilityLevel": "JAVA_25",
   "mixins": [
-    "ChatListenerMixin"
+    "ChatListenerMixin",
+    "GameRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1

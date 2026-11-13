@@ -10,7 +10,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import potatoslayer56.miscmining.ShaftParty;
+import potatoslayer56.miscmining.rendering.ModRenderPipeline;
 
+import java.util.ArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -71,6 +73,8 @@ public class ChatListenerMixin {
   @Inject(method="handleSystemMessage", at = @At("TAIL"))
   private void shaftDetection(Component message, boolean remote, CallbackInfo ci) {
     if (message.getString().startsWith("§aYou are playing on profile:")) {
+      ModRenderPipeline.waypoints = new ArrayList<>();
+
       HypixelModAPI.getInstance().sendPacket(new ServerboundPartyInfoPacket());
       shaftType = getPlayerShaftType();
 

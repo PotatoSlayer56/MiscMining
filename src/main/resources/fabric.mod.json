@@ -14,7 +14,8 @@
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"potatoslayer56.miscmining.MiscMining"
+			"potatoslayer56.miscmining.MiscMining",
+			"potatoslayer56.miscmining.rendering.ModRenderPipeline"
 		]
 	},
 	"mixins": [
