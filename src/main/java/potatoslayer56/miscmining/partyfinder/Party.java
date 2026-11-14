@@ -5,20 +5,13 @@ import java.util.List;
 public class Party {
   public int id;
   public String note;
-  public List<List<String>> members;
+  public String owner;
+  public int size;
 
-  public Party(int id, String n, List<List<String>> m) {
+  public Party(int id, String n, String o, int s) {
     this.id = id;
     this.note = n;
-    this.members = m;
-  }
-
-  public String getPartyDisplayNames() {
-    StringBuilder str = new StringBuilder();
-    members.forEach(member -> {
-      str.append(member.getLast());
-      if (members.getLast() != member) {str.append(", ");}
-    });
-    return str.toString();
+    this.owner = o;
+    this.size = s;
   }
 }

@@ -4,6 +4,7 @@ import net.minecraft.client.Minecraft;
 import potatoslayer56.miscmining.commands.CustomCommand;
 import potatoslayer56.miscmining.rendering.ModRenderPipeline;
 
+import java.util.ArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -18,6 +19,7 @@ public class JungleCheese implements CustomCommand {
     int y = (int) Minecraft.getInstance().player.position().y;
     int z = (int) Minecraft.getInstance().player.position().z;
 
+    ModRenderPipeline.waypoints = new ArrayList<>();
 
     ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
     sendCommandFromPlayer("pc x:%d,y:%d,z:%d".formatted(x+4, y+10, z+65));

@@ -82,7 +82,7 @@ public class MiscMining implements ModInitializer {
     registerSubCommand("metalprices", new MetalPrices());
     registerSubCommand("corpsekeyprofit", new CorpseKeyProfit());
     registerSubCommand("refreshprices", new RefreshPrices());
-    //registerSubCommand("partyfinder", new PartyFinderCommand());
+    registerSubCommand("partyfinder", new PartyFinderCommand());
     registerSubCommand("junglecheese", new JungleCheese());
     //registerSubCommand("dev", new Dev());
     registerSubCommand("config", new ConfigSubcommand());

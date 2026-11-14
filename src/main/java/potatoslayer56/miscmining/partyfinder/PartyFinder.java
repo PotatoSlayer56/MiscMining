@@ -11,9 +11,13 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.sql.Time;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static potatoslayer56.miscmining.MiscMining.clientPrefixedMessage;
 
@@ -27,6 +31,7 @@ public class PartyFinder {
   public static boolean inPartyFinder = false;
 
   public static String serverAddress = "http://[2001:19f0:5400:1286:5400:07ff:fe06:2a19]/api/data";
+  //public static String serverAddress = "http://127.0.0.1:5678/api/data";
 
   public static List<List<String>> partyMembers = new ArrayList<>();
   public static int partySize;
@@ -55,16 +60,9 @@ public class PartyFinder {
         JSONObject data = (JSONObject) party;
         int id = data.getInt("id");
         String note = data.getString("note");
-        List<List<String>> members = new ArrayList<>();
-        data.getJSONArray("members").forEach(member -> {
-          JSONObject memberData = (JSONObject) member;
-          assert Minecraft.getInstance().player != null;
-          if (Objects.equals(memberData.getString("username"), Minecraft.getInstance().player.getPlainTextName())) {
-            currentPartyID = id;
-          }
-          members.add(List.of(memberData.getString("username"), memberData.getString("displayName")));
-        });
-        parties.add(new Party(id, note, members));
+        String owner = data.getString("owner");
+        int size = data.getInt("size");
+        parties.add(new Party(id, note, owner, size));
       });
     } catch (Exception e) {
       MiscMining.LOGGER.info(e.toString());
@@ -100,12 +98,11 @@ public class PartyFinder {
 
   public static void registerParty(Party party) {
     JSONObject json = new JSONObject();
-    JSONArray members = new JSONArray();
+    currentPartyID = ThreadLocalRandom.current().nextInt(1, 1000000000);
+    json.append("id", currentPartyID);
     json.append("note", party.note);
-    party.members.forEach(member -> {
-      members.put(new JSONObject().append("username", member.getFirst()).append("displayName", member.getLast()));
-    });
-    json.append("members", members);
+    json.append("owner", party.owner);
+    json.append("size", party.size);
 
     try {
       URL url = new URL(serverAddress);
@@ -144,8 +141,12 @@ public class PartyFinder {
 
       connection.setDoOutput(true);
 
+      JSONObject json = new JSONObject();
+      json.append("id", id);
+
       try (OutputStream os = connection.getOutputStream()) {
-        os.write(id);
+        byte[] input = json.toString().getBytes(StandardCharsets.UTF_8);
+        os.write(input, 0, input.length);
       }
 
       MiscMining.LOGGER.info(connection.getResponseMessage());

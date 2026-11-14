@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static potatoslayer56.miscmining.MiscMining.clientPrefixedMessage;
 import static potatoslayer56.miscmining.MiscMining.sendCommandFromPlayer;
 
 public class PartyFinderScreen extends Screen {
@@ -46,11 +45,11 @@ public class PartyFinderScreen extends Screen {
     y.set(10);
 
     PartyFinder.parties.forEach(party -> {
-      StringWidget tempNoteWidget = new StringWidget(x, y.get(), 100, font.lineHeight, Component.literal(party.note.replace("&", "§").replace("§§", "&")), font);
-      StringWidget tempMembersWidget = new StringWidget(x + 150, y.get(), 400, font.lineHeight, Component.literal(party.getPartyDisplayNames()), font);
+      StringWidget tempNoteWidget = new StringWidget(x, y.get() + 7, 100, font.lineHeight, Component.literal(party.note.replace("&", "§").replace("§§", "&")), font);
+      StringWidget tempMembersWidget = new StringWidget(x + 150, y.get() + 7, 400, font.lineHeight, Component.literal("%d/4    -    %s".formatted(party.size, party.owner)), font);
       Button tempJoinButton = Button.builder(Component.literal("Join"), (button -> {
-        sendCommandFromPlayer("p %s".formatted(party.members.getFirst().getFirst()));
-      })).bounds(x + 700, y.get(), font.width("Join") + 16, font.lineHeight + 8).build();
+        sendCommandFromPlayer("p %s".formatted(party.owner));
+      })).bounds(x + 200 + font.width("4/4    -    MMMMMMMMMMMMMMMM"), y.get(), font.width("Join") + 16, font.lineHeight + 8).build();
       y.addAndGet(32);
       partyGuiElements.add(new PartyGuiElement(tempNoteWidget, tempMembersWidget, tempJoinButton));
     });
@@ -65,18 +64,26 @@ public class PartyFinderScreen extends Screen {
 
     Button registerPartyButton = Button.builder(Component.literal("Register Party"), (button -> {
       if (!PartyFinder.inPartyFinder) {
-        PartyFinder.registerParty(new Party(0, noteBox.getValue(), PartyFinder.partyMembers));
+        PartyFinder.registerParty(new Party(0, noteBox.getValue(), Minecraft.getInstance().player.getPlainTextName(), 1));
         PartyFinder.inPartyFinder = true;
       }
     })).bounds(800, 40, font.width("Register Party")+16, font.lineHeight + 8).build();
 
+    Button unregisterPartyButton = Button.builder(Component.literal("Unregister Party"), (button -> {
+      if (PartyFinder.inPartyFinder) {
+        PartyFinder.unregisterParty(PartyFinder.currentPartyID);
+        PartyFinder.inPartyFinder = false;
+      }
+    })).bounds(800, 70, font.width("Unregister Party")+16, font.lineHeight + 8).build();
+
     Button refreshButton = Button.builder(Component.literal("Refresh Party Finder"), (button -> {
       PartyFinder.getParties();
       Minecraft.getInstance().gui.setScreen(new PartyFinderScreen(Component.literal("2LPartyFinder"), this.parent));
-    })).bounds(800, 70, font.width("Refresh Party Finder")+16, font.lineHeight + 8).build();
+    })).bounds(800, 100, font.width("Refresh Party Finder")+16, font.lineHeight + 8).build();
 
     this.addRenderableWidget(noteBox);
     this.addRenderableWidget(registerPartyButton);
+    this.addRenderableWidget(unregisterPartyButton);
     this.addRenderableWidget(refreshButton);
   }
 
