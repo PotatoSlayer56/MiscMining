@@ -8,6 +8,7 @@
 - Shaft Parties - Creates a shaft party that others can be added to and will automatically warp them into specified shafts!
 - Lapis Parties - Toggle this on and the mod will automatically warp your party into shafts!
 - Jungle Cheese - Posts jungle temple cheese coordinated in party chat and adds waypoints to them
+- Party Finder - A party finder that can be used for anything!
 
 ## Commands
 - `/miscmining <subcommand>` this holds all non shaft party commands
