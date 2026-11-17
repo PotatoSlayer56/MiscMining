@@ -16,6 +16,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.level.LevelExtractionContext;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelExtractionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
+import net.jpountz.xxhash.XXHash32;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.StagedVertexBuffer;
@@ -32,6 +33,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.OptionalDouble;
 
+import static potatoslayer56.miscmining.MiscMining.balWaypoint;
+
 public class ModRenderPipeline implements ModInitializer {
   private static final RenderPipeline FILLED_THROUGH_WALLS = RenderPipelines.register(RenderPipeline.builder(RenderPipelines.DEBUG_FILLED_SNIPPET)
     .withLocation(Identifier.withDefaultNamespace("pipeline/filled_box_through_walls"))
@@ -45,6 +48,11 @@ public class ModRenderPipeline implements ModInitializer {
   private static final Vector3f MODEL_OFFSET = new Vector3f();
   private static final Matrix4f TEXTURE_MATRIX = new Matrix4f();
   private static final StagedVertexBuffer STAGED_BUFFER = new StagedVertexBuffer(() -> "Waypoints Buffer", RenderType.SMALL_BUFFER_SIZE);
+
+  public enum waypointTypes {
+    SINGLE,
+    THREEBYTHREE
+  }
 
   @Override
   public void onInitialize() {
@@ -87,9 +95,38 @@ public class ModRenderPipeline implements ModInitializer {
     final VertexConsumer builder = STAGED_BUFFER.getVertexBuilder(draw);
 
     waypoints.forEach(waypointState -> {
-      this.renderFilledBox(matrices.last().pose(), builder, waypointState.x(), waypointState.y(), waypointState.z(), waypointState.x() + 1, waypointState.y() + 1, waypointState.z() + 1, waypointState.r(), waypointState.g(), waypointState.b(), waypointState.a());
+      if (waypointState.type() == waypointTypes.SINGLE) {
+        this.renderFilledBox(matrices.last().pose(), builder, waypointState.x(), waypointState.y(), waypointState.z(), waypointState.x() + 1, waypointState.y() + 1, waypointState.z() + 1, waypointState.r(), waypointState.g(), waypointState.b(), waypointState.a());
+      } else if (waypointState.type() == waypointTypes.THREEBYTHREE) {
+        this.renderOutlinedBox(matrices.last().pose(), builder, waypointState.x() - 1, waypointState.y(), waypointState.z() - 1, waypointState.x() + 2, waypointState.y() + 0.25f, waypointState.z() + 2, waypointState.r(), waypointState.g(), waypointState.b(), waypointState.a());
+      }
     });
+
+    if (balWaypoint != null){
+      this.renderOutlinedBox(matrices.last().pose(), builder, balWaypoint.x() - 1, balWaypoint.y(), balWaypoint.z() - 1, balWaypoint.x() + 2, balWaypoint.y() + 0.25f, balWaypoint.z() + 2, balWaypoint.r(), balWaypoint.g(), balWaypoint.b(), balWaypoint.a());
+    }
+
     matrices.popPose();
+  }
+
+  private void renderOutlinedBox(Matrix4f positionMatrix, VertexConsumer buffer, float minX, float minY, float minZ, float maxX, float maxY, float maxZ, float red, float green, float blue, float alpha) {
+    // Sides
+    renderFilledBox(positionMatrix, buffer, minX, minY, minZ, minX + 0.05f, maxY, minZ + 0.05f, red, green, blue, alpha);
+    renderFilledBox(positionMatrix, buffer, maxX, minY, minZ, maxX - 0.05f, maxY, minZ + 0.05f, red, green, blue, alpha);
+    renderFilledBox(positionMatrix, buffer, minX, minY, maxZ, minX + 0.05f, maxY, maxZ - 0.05f, red, green, blue, alpha);
+    renderFilledBox(positionMatrix, buffer, maxX, minY, maxZ, maxX - 0.05f, maxY, maxZ - 0.05f, red, green, blue, alpha);
+
+    // Top
+    renderFilledBox(positionMatrix, buffer, minX, maxY, minZ, maxX, maxY - 0.05f, minZ + 0.05f, red, green, blue, alpha);
+    renderFilledBox(positionMatrix, buffer, minX, maxY, minZ, minX + 0.05f, maxY - 0.05f, maxZ, red, green, blue, alpha);
+    renderFilledBox(positionMatrix, buffer, minX, maxY, maxZ, maxX, maxY - 0.05f, maxZ - 0.05f, red, green, blue, alpha);
+    renderFilledBox(positionMatrix, buffer, maxX, maxY, minZ, maxX - 0.05f, maxY - 0.05f, maxZ, red, green, blue, alpha);
+
+    // Bottom
+    renderFilledBox(positionMatrix, buffer, minX, minY, minZ, maxX, minY + 0.05f, minZ + 0.05f, red, green, blue, alpha);
+    renderFilledBox(positionMatrix, buffer, minX, minY, minZ, minX + 0.05f, minY + 0.05f, maxZ, red, green, blue, alpha);
+    renderFilledBox(positionMatrix, buffer, minX, minY, maxZ, maxX, minY + 0.05f, maxZ - 0.05f, red, green, blue, alpha);
+    renderFilledBox(positionMatrix, buffer, maxX, minY, minZ, maxX - 0.05f, minY + 0.05f, maxZ, red, green, blue, alpha);
   }
 
   private void renderFilledBox(Matrix4f positionMatrix, VertexConsumer buffer, float minX, float minY, float minZ, float maxX, float maxY, float maxZ, float red, float green, float blue, float alpha) {
@@ -160,5 +197,5 @@ public class ModRenderPipeline implements ModInitializer {
     STAGED_BUFFER.close();
   }
 
-  public record WaypointRenderState(int x, int y, int z, float r, float g, float b, float a) { }
+  public record WaypointRenderState(int x, int y, int z, float r, float g, float b, float a, waypointTypes type) { }
 }

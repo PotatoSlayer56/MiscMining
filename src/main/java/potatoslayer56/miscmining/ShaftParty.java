@@ -4,6 +4,7 @@ import net.hypixel.modapi.HypixelModAPI;
 import net.hypixel.modapi.packet.impl.clientbound.ClientboundPartyInfoPacket;
 import net.hypixel.modapi.packet.impl.clientbound.event.ClientboundLocationPacket;
 import net.hypixel.modapi.packet.impl.serverbound.ServerboundPartyInfoPacket;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.scores.PlayerTeam;
@@ -84,7 +85,7 @@ public class ShaftParty {
 
   public static int getLapisCorpseCount() {
     AtomicInteger count = new AtomicInteger();
-    Collection<PlayerInfo> tabList = client.player.connection.getListedOnlinePlayers();
+    Collection<PlayerInfo> tabList = Minecraft.getInstance().player.connection.getListedOnlinePlayers();
     tabList.forEach(playerInfo -> {
       if (playerInfo != null && playerInfo.getTabListDisplayName() != null) {
         if (playerInfo.getTabListDisplayName().getString().contains("Lapis")) {
@@ -96,7 +97,7 @@ public class ShaftParty {
   }
 
   public static String getPlayerShaftType() {
-    Scoreboard scoreboard = client.level.getScoreboard();
+    Scoreboard scoreboard = Minecraft.getInstance().level.getScoreboard();
 
     Collection<PlayerTeam> playerTeams = scoreboard.getPlayerTeams();
 

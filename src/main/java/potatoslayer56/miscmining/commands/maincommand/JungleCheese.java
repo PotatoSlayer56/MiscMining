@@ -26,8 +26,8 @@ public class JungleCheese implements CustomCommand {
     scheduler.schedule(() -> { sendCommandFromPlayer("pc x:%d,y:%d,z:%d".formatted(x+29, y-32, z+65)); },1000L, TimeUnit.MILLISECONDS);
     scheduler.schedule(() -> { sendCommandFromPlayer("pc x:%d,y:%d,z:%d".formatted(x+29, y-32, z+48)); },2000L, TimeUnit.MILLISECONDS);
     scheduler.shutdown();
-    ModRenderPipeline.waypoints.add(new ModRenderPipeline.WaypointRenderState(x+4,y+10,z+65,0f,1f,0f,1f));
-    ModRenderPipeline.waypoints.add(new ModRenderPipeline.WaypointRenderState(x+29,y-32,z+65,0f,1f,0f,1f));
-    ModRenderPipeline.waypoints.add(new ModRenderPipeline.WaypointRenderState(x+29,y-32,z+48,0f,1f,0f,1f));
+    ModRenderPipeline.waypoints.add(new ModRenderPipeline.WaypointRenderState(x+4,y+10,z+65,0f,1f,0f,1f,ModRenderPipeline.waypointTypes.SINGLE));
+    ModRenderPipeline.waypoints.add(new ModRenderPipeline.WaypointRenderState(x+29,y-32,z+65,0f,1f,0f,1f,ModRenderPipeline.waypointTypes.SINGLE));
+    ModRenderPipeline.waypoints.add(new ModRenderPipeline.WaypointRenderState(x+29,y-32,z+48,0f,1f,0f,1f,ModRenderPipeline.waypointTypes.SINGLE));
   }
 }

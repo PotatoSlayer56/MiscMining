@@ -9,6 +9,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import potatoslayer56.miscmining.MiscMining;
 import potatoslayer56.miscmining.ShaftParty;
 import potatoslayer56.miscmining.rendering.ModRenderPipeline;
 
@@ -30,6 +31,11 @@ public class ChatListenerMixin {
       waitingForJoin.forEach(ign -> {
         if (message.getString().contains(ign)) {
           sendCommandFromPlayer("p warp");
+          if (shamelessPlug) {
+            ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+            scheduler.schedule(() -> { sendCommandFromPlayer("pc Automatically warped into 2l+ shaft by MiscMining"); }, 1000L, TimeUnit.MILLISECONDS);
+            scheduler.shutdown();
+          }
         }
       });
     }
@@ -74,6 +80,8 @@ public class ChatListenerMixin {
   private void shaftDetection(Component message, boolean remote, CallbackInfo ci) {
     if (message.getString().startsWith("§aYou are playing on profile:")) {
       ModRenderPipeline.waypoints = new ArrayList<>();
+      atBalPosition = null;
+      balWaypoint = null;
 
       HypixelModAPI.getInstance().sendPacket(new ServerboundPartyInfoPacket());
       shaftType = getPlayerShaftType();
@@ -100,8 +108,31 @@ public class ChatListenerMixin {
 
   @Inject(method="handleSystemMessage", at = @At("TAIL"))
   private void autoWarpLapisParty(Component message, boolean remote, CallbackInfo ci) {
-    if (inLapisParty && message.getString().contains("The party was transferred to") && message.getString().contains(Minecraft.getInstance().player.nameAndId().name())) {
+    if (inLapisParty && waitingForPartyTransfer && message.getString().contains("The party was transferred to") && message.getString().contains(Minecraft.getInstance().player.nameAndId().name())) {
       sendCommandFromPlayer("p warp");
+      if (shamelessPlug) {
+        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+        scheduler.schedule(() -> { sendCommandFromPlayer("pc Automatically warped into 2l+ shaft by MiscMining"); }, 1000L, TimeUnit.MILLISECONDS);
+        scheduler.shutdown();
+      }
+      waitingForPartyTransfer = false;
+    }
+  }
+
+  @Inject(method="handleSystemMessage", at = @At("TAIL"))
+  private void crystalNotify(Component message, boolean remote, CallbackInfo ci) {
+    if (crystalNotify) {
+      if (message.getString().contains("✦ CRYSTAL FOUND (1/5)")) {
+        sendCommandFromPlayer("pc 1/5");
+      } else if (message.getString().contains("✦ CRYSTAL FOUND (2/5)")) {
+        sendCommandFromPlayer("pc 2/5");
+      } else if (message.getString().contains("✦ CRYSTAL FOUND (3/5)")) {
+        sendCommandFromPlayer("pc 3/5");
+      } else if (message.getString().contains("✦ CRYSTAL FOUND (4/5)")) {
+        sendCommandFromPlayer("pc 4/5");
+      } else if (message.getString().contains("✦ CRYSTAL FOUND (5/5)")) {
+        sendCommandFromPlayer("pc 5/5");
+      }
     }
   }
 }

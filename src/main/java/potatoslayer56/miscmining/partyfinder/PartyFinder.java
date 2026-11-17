@@ -33,7 +33,6 @@ public class PartyFinder {
   public static String serverAddress = "http://[2001:19f0:5400:1286:5400:07ff:fe06:2a19]/api/data";
   //public static String serverAddress = "http://127.0.0.1:5678/api/data";
 
-  public static List<List<String>> partyMembers = new ArrayList<>();
   public static int partySize;
 
   public static int currentPartyID;

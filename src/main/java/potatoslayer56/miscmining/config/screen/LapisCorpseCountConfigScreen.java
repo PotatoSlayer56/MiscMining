@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static potatoslayer56.miscmining.MiscMining.client;
 import static potatoslayer56.miscmining.ShaftParty.shaftCategories;
 
 public class LapisCorpseCountConfigScreen extends Screen {
