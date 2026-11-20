@@ -1,6 +1,5 @@
 package potatoslayer56.miscmining.partyfinder;
 
-import net.minecraft.client.Minecraft;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import potatoslayer56.miscmining.MiscMining;
@@ -11,16 +10,9 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.sql.Time;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
-
-import static potatoslayer56.miscmining.MiscMining.clientPrefixedMessage;
-
 
 public class PartyFinder {
   public static String pfDataString;
@@ -46,8 +38,6 @@ public class PartyFinder {
       pfDataString = getPartyFinderData();
       pfDataArray = new JSONArray(pfDataString);
     } catch (Exception e) {
-      MiscMining.LOGGER.info(e.toString());
-      clientPrefixedMessage(e.toString());
     }
   }
 
@@ -64,8 +54,6 @@ public class PartyFinder {
         parties.add(new Party(id, note, owner, size));
       });
     } catch (Exception e) {
-      MiscMining.LOGGER.info(e.toString());
-      clientPrefixedMessage(e.toString());
     }
   }
 
@@ -88,8 +76,6 @@ public class PartyFinder {
       return fullJsonString;
 
     } catch (Exception e) {
-      MiscMining.LOGGER.error(e.toString());
-      clientPrefixedMessage(e.toString());
     }
 
     return "";
@@ -123,8 +109,6 @@ public class PartyFinder {
 
       connection.disconnect();
     } catch (Exception e) {
-      MiscMining.LOGGER.error(e.toString());
-      clientPrefixedMessage(e.toString());
     }
   }
 
@@ -152,8 +136,6 @@ public class PartyFinder {
 
       connection.disconnect();
     } catch (Exception e) {
-      MiscMining.LOGGER.error(e.toString());
-      clientPrefixedMessage(e.toString());
     }
   }
 }

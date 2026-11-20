@@ -21,6 +21,9 @@ import static potatoslayer56.miscmining.ShaftParty.shaftCategories;
 public class LapisCorpseCountConfigScreen extends Screen {
   private final @Nullable Screen parent;
 
+  int effectiveWindowWidth;
+  int effectiveWindowHeight;
+
   public LapisCorpseCountConfigScreen(@Nullable Screen parent) {
     super(Component.literal("MiscMiningLapisConfigScreen"));
     this.parent = parent;
@@ -35,14 +38,14 @@ public class LapisCorpseCountConfigScreen extends Screen {
       guiScale = 2;
     }
 
-    int effectiveWindowWidth = Minecraft.getInstance().getWindow().getWidth() / guiScale;
-    int effectiveWindowHeight = Minecraft.getInstance().getWindow().getHeight() / guiScale;
+    effectiveWindowWidth = Minecraft.getInstance().getWindow().getWidth() / guiScale;
+    effectiveWindowHeight = Minecraft.getInstance().getWindow().getHeight() / guiScale;
 
     Map<String, Map<StringWidget, EditBox>> widgets = new HashMap<>();
     AtomicInteger x = new AtomicInteger();
     AtomicInteger y = new AtomicInteger();
-    x.set(30);
-    y.set(40);
+    x.set(34);
+    y.set(44);
     Variables.shaftLapisCounts.forEach((type, count) -> {
       widgets.put(type, new HashMap<>());
       widgets.get(type).put(
@@ -70,12 +73,12 @@ public class LapisCorpseCountConfigScreen extends Screen {
       });
       y.addAndGet(32);
       if (y.get() >= effectiveWindowHeight * 0.75) {
-        y.set(40);
+        y.set(44);
         x.addAndGet(100);
       }
     });
 
-    Button saveButton = Button.builder(Component.literal("Save"), (button -> {
+    Button backButton = Button.builder(Component.literal("Back"), (button -> {
       widgets.forEach((type, map) -> {
         map.forEach((label, editbox) -> {
           Variables.shaftLapisCounts.replace(type, Integer.valueOf(editbox.getValue()));
@@ -85,6 +88,7 @@ public class LapisCorpseCountConfigScreen extends Screen {
         shaftCategories.get("GEMS").put(type, count);
       });
       SaveLoad.save();
+      Minecraft.getInstance().gui.setScreen(new MainConfigScreen(this.parent));
     })).bounds(
       30,
       (int) Math.floor(effectiveWindowHeight * 0.85),
@@ -92,12 +96,14 @@ public class LapisCorpseCountConfigScreen extends Screen {
       20
     ).build();
 
-    this.addRenderableWidget(saveButton);
+    this.addRenderableWidget(backButton);
   }
 
   @Override
   public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
-    graphics.text(font, Component.literal("MiscMining"), 10, 10, 0xFFFFFF, false);
+    graphics.fill(0, 0, effectiveWindowWidth, effectiveWindowHeight, 0xff3d3c42);
+    graphics.fill(4, 4, effectiveWindowWidth-4, effectiveWindowHeight-4, 0xff232226);
+    graphics.text(font, Component.literal("MiscMining"), 14, 14, 0xFFFFFF, false);
     super.extractRenderState(graphics, mouseX, mouseY, delta);
   }
 

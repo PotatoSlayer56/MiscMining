@@ -6,6 +6,10 @@ import java.util.Map;
 public class Variables {
   public static Map<String, Integer> shaftLapisCounts = new HashMap<>();
 
+  public static boolean shamelessPlug = false;
+  public static boolean crystalNotify = false;
+  public static boolean nucleusRunProfitShare = false;
+
   public static Map<String, Integer> defaultLapisCountsConfig() {
     Map<String, Integer> config = new HashMap<>();
     config.put("JADE_1", 3);
@@ -36,5 +40,10 @@ public class Variables {
     return config;
   }
 
-
+  public static void setDefaults() {
+    shaftLapisCounts = defaultLapisCountsConfig();
+    shamelessPlug = false;
+    crystalNotify = false;
+    nucleusRunProfitShare = false;
+  }
 }

@@ -1,23 +1,25 @@
 package potatoslayer56.miscmining.config;
 
-import org.apache.logging.log4j.core.jackson.Log4jJsonObjectMapper;
 import org.json.JSONObject;
 import potatoslayer56.miscmining.MiscMining;
 
 import java.io.*;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class SaveLoad {
 
   public static String configPath = "config/miscmining.json";
 
   public static void save(){
-    String jsonData = new JSONObject(Variables.shaftLapisCounts).toString();
+    JSONObject jsonData = new JSONObject();
+    jsonData.put("lapiscorpses", Variables.shaftLapisCounts);
+    jsonData.put("crystalnotify", Variables.crystalNotify);
+    jsonData.put("profitshare", Variables.nucleusRunProfitShare);
+    jsonData.put("shamelessplug", Variables.shamelessPlug);
+    String jsonString = jsonData.toString();
     try {
       FileWriter fileWriter = new FileWriter(configPath);
-      fileWriter.write(jsonData);
+      fileWriter.write(jsonString);
       fileWriter.close();
     } catch (IOException e) {
       throw new RuntimeException(e);
@@ -37,9 +39,13 @@ public class SaveLoad {
 
       JSONObject jsonData = new JSONObject(data.toString());
 
+      Variables.crystalNotify = jsonData.getBoolean("crystalnotify");
+      Variables.nucleusRunProfitShare = jsonData.getBoolean("profitshare");
+      Variables.shamelessPlug = jsonData.getBoolean("shamelessplug");
+
       Variables.shaftLapisCounts = new HashMap<>();
 
-      jsonData.toMap().forEach((type, count) -> {
+      jsonData.getJSONObject("lapiscorpses").toMap().forEach((type, count) -> {
         Variables.shaftLapisCounts.put(type, (Integer) count);
       });
 
@@ -48,8 +54,8 @@ public class SaveLoad {
       });
 
     } catch (Exception e) {
-      MiscMining.LOGGER.info("Missing config file");
-      Variables.shaftLapisCounts = Variables.defaultLapisCountsConfig();
+      MiscMining.LOGGER.info("Error with config file");
+      Variables.setDefaults();
       save();
     }
   }

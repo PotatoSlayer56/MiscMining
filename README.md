@@ -12,6 +12,7 @@
 - At Bal Position Message - Let your nucleus run party know when you are at bal
 - Crystal Notify - Notify your nucleus party on crystal progress
 - Shameless Plug - Advertise in party chat whenever the mod automatically warps someone
+- Nucleus Run Profit Share - Shares nucleus run profit in chat - needs skyhanni
 
 ## Commands
 - `/miscmining <subcommand>` this holds all non shaft party commands

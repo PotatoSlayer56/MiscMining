@@ -9,7 +9,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import potatoslayer56.miscmining.MiscMining;
 import potatoslayer56.miscmining.ShaftParty;
 import potatoslayer56.miscmining.rendering.ModRenderPipeline;
 
@@ -22,6 +21,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static potatoslayer56.miscmining.MiscMining.*;
 import static potatoslayer56.miscmining.ShaftParty.*;
 import static potatoslayer56.miscmining.LapisParty.*;
+import static potatoslayer56.miscmining.config.Variables.*;
 
 @Mixin(ChatListener.class)
 public class ChatListenerMixin {
@@ -132,6 +132,15 @@ public class ChatListenerMixin {
         sendCommandFromPlayer("pc 4/5");
       } else if (message.getString().contains("✦ CRYSTAL FOUND (5/5)")) {
         sendCommandFromPlayer("pc 5/5");
+      }
+    }
+  }
+
+  @Inject(method="handleSystemMessage", at = @At("TAIL"))
+  private void profitShare(Component message, boolean remote, CallbackInfo ci) {
+    if (nucleusRunProfitShare) {
+      if (message.getString().contains("[Skyhanni] Profit for Crystal Nucleus Run")) {
+        sendCommandFromPlayer("pc %s".formatted(message.getString().replace("§","")));
       }
     }
   }

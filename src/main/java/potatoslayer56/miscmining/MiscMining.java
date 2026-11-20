@@ -46,10 +46,6 @@ public class MiscMining implements ModInitializer {
   public static int[] atBalPosition = null;
   public static boolean inBalPosition = false;
 
-  public static boolean shamelessPlug = false;
-
-  public static boolean crystalNotify = false;
-
   public static Map<String, CustomCommand> subCommands = new HashMap<>();
 
   public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
@@ -82,12 +78,9 @@ public class MiscMining implements ModInitializer {
     registerSubCommand("refreshprices", new RefreshPrices());
     registerSubCommand("partyfinder", new PartyFinderCommand());
     registerSubCommand("junglecheese", new JungleCheese());
-    //registerSubCommand("dev", new Dev());
     registerSubCommand("config", new ConfigSubcommand());
     registerSubCommand("togglelapisparty", new ToggleLapisParty());
     registerSubCommand("atbal", new AtBalCommand());
-    registerSubCommand("crystalnotify", new CrystalNotify());
-    registerSubCommand("shamelessplug", new ShamelessPlug());
 
     MainCommand.register();
     ShaftParty.init();
