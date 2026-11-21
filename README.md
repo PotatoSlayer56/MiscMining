@@ -15,6 +15,8 @@
 - Nucleus Run Profit Share - Shares nucleus run profit in chat - needs skyhanni
 - Low tool notify - Prompts you to refill your inventory on tools when you run out
 - Update Checker - Checks for the latest version
+- Mole Remind - Reminds you to equip mole after grabbing last crystal
+- Nucleus Run PBs - Tracks nucleus run pb
 
 ## Commands
 - `/miscmining <subcommand>` this holds all non shaft party commands
