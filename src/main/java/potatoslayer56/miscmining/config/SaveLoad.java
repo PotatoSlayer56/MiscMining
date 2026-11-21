@@ -1,5 +1,6 @@
 package potatoslayer56.miscmining.config;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 import potatoslayer56.miscmining.MiscMining;
 
@@ -16,6 +17,8 @@ public class SaveLoad {
     jsonData.put("crystalnotify", Variables.crystalNotify);
     jsonData.put("profitshare", Variables.nucleusRunProfitShare);
     jsonData.put("shamelessplug", Variables.shamelessPlug);
+    jsonData.put("lowtoolnotify", Variables.lowToolsNotify);
+    jsonData.put("updatechecker", Variables.updateChecker);
     String jsonString = jsonData.toString();
     try {
       FileWriter fileWriter = new FileWriter(configPath);
@@ -39,22 +42,28 @@ public class SaveLoad {
 
       JSONObject jsonData = new JSONObject(data.toString());
 
-      Variables.crystalNotify = jsonData.getBoolean("crystalnotify");
-      Variables.nucleusRunProfitShare = jsonData.getBoolean("profitshare");
-      Variables.shamelessPlug = jsonData.getBoolean("shamelessplug");
+      try { Variables.crystalNotify = jsonData.getBoolean("crystalnotify"); } catch (JSONException e) { MiscMining.log("Entry missing from config"); }
+      try { Variables.nucleusRunProfitShare = jsonData.getBoolean("profitshare"); } catch (JSONException e) { MiscMining.log("Entry missing from config"); }
+      try { Variables.shamelessPlug = jsonData.getBoolean("shamelessplug"); } catch (JSONException e) { MiscMining.log("Entry missing from config"); }
+      try { Variables.lowToolsNotify = jsonData.getBoolean("lowtoolsnotify"); } catch (JSONException e) { MiscMining.log("Entry missing from config"); }
+      try { Variables.updateChecker = jsonData.getBoolean("updatechecker"); } catch (JSONException e) { MiscMining.log("Entry missing from config"); }
 
       Variables.shaftLapisCounts = new HashMap<>();
 
-      jsonData.getJSONObject("lapiscorpses").toMap().forEach((type, count) -> {
-        Variables.shaftLapisCounts.put(type, (Integer) count);
-      });
+      try {
+        jsonData.getJSONObject("lapiscorpses").toMap().forEach((type, count) -> {
+          Variables.shaftLapisCounts.put(type, (Integer) count);
+        });
+      } catch (JSONException e) {
+        MiscMining.log("Entry missing from config");
+      }
 
       Variables.defaultLapisCountsConfig().forEach((type, count) -> {
         Variables.shaftLapisCounts.putIfAbsent(type, count);
       });
 
     } catch (Exception e) {
-      MiscMining.LOGGER.info("Error with config file");
+      MiscMining.log("Error with config file, setting default");
       Variables.setDefaults();
       save();
     }

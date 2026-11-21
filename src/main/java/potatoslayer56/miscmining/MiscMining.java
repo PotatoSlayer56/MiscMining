@@ -3,10 +3,13 @@ package potatoslayer56.miscmining;
 import net.fabricmc.api.ModInitializer;
 
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.loader.api.FabricLoader;
 import net.hypixel.modapi.HypixelModAPI;
 import net.hypixel.modapi.packet.impl.clientbound.ClientboundPartyInfoPacket;
 import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
 import net.minecraft.resources.Identifier;
 
 import net.minecraft.world.phys.Vec3;
@@ -38,6 +41,9 @@ public class MiscMining implements ModInitializer {
   public static JSONObject bazaarData;
   public static JSONObject bazaarProducts;
 
+  public static String version = FabricLoader.getInstance().getModContainer(MOD_ID).map(modContainer -> modContainer.getMetadata().getVersion().getFriendlyString()).orElse("unknown");
+  public static String latestVersion = "1.7";
+
   public static float locketPrice;
   public static float wispPrice;
   public static float frostDyePrice;
@@ -60,7 +66,7 @@ public class MiscMining implements ModInitializer {
       bazaarData = new JSONObject(getBazaarData());
       bazaarProducts = bazaarData.getJSONObject("products");
     } catch (JSONException e) {
-      MiscMining.LOGGER.error("Failed to fetch bazaar products");
+      MiscMining.error("Failed to fetch bazaar products");
     }
 
     HypixelModAPI.getInstance().createHandler(ClientboundPartyInfoPacket.class, clientBoundPartyInfoPacket -> {
@@ -103,6 +109,28 @@ public class MiscMining implements ModInitializer {
         }
       }
     });
+
+    String fullJsonString = "";
+    try {
+      URL url = new URL("https://api.modrinth.com/v2/project/qYu3vA2S/version");
+      HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+      connection.setRequestMethod("GET");
+      // Read the response
+      BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+      String line;
+      while ((line = in.readLine()) != null) {
+        fullJsonString += line;
+      }
+      in.close();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    try {
+      JSONArray jsonData = new JSONArray(fullJsonString);
+      latestVersion = jsonData.getJSONObject(0).getString("version_number");
+    } catch (JSONException e) {
+      MiscMining.log(e.toString());
+    }
   }
 
   public static Identifier id(String path) {
@@ -110,7 +138,7 @@ public class MiscMining implements ModInitializer {
   }
 
   public static String getBazaarData(){
-    MiscMining.LOGGER.info("Fetching bazaar prices");
+    MiscMining.log("Fetching bazaar prices");
     String fullJsonString = "";
     try {
       URL url = new URL("https://api.hypixel.net/v2/skyblock/bazaar");
@@ -161,7 +189,7 @@ public class MiscMining implements ModInitializer {
       BigDecimal price = (BigDecimal) bazaarProducts.getJSONObject(productID).getJSONObject("quick_status").get("buyPrice");
       return price.floatValue();
     } catch (JSONException e) {
-      MiscMining.LOGGER.error("Failed to fetch price for %s".formatted(productID));
+      MiscMining.error("Failed to fetch price for %s".formatted(productID));
       return 0;
     }
   }
@@ -171,7 +199,7 @@ public class MiscMining implements ModInitializer {
       BigDecimal price = (BigDecimal) bazaarProducts.getJSONObject(productID).getJSONObject("quick_status").get("sellPrice");
       return price.floatValue();
     } catch (JSONException e) {
-      MiscMining.LOGGER.error("Failed to fetch price for %s".formatted(productID));
+      MiscMining.error("Failed to fetch price for %s".formatted(productID));
       return 0;
     }
   }
@@ -184,6 +212,10 @@ public class MiscMining implements ModInitializer {
     if (Minecraft.getInstance().player != null) Minecraft.getInstance().player.sendSystemMessage(Component.literal("§8[§bMisc§dMining§8]§f %s".formatted(message)));
   }
 
+  public static void clientPrefixedCommandMessage(String message, String command) {
+    if (Minecraft.getInstance().player != null) Minecraft.getInstance().player.sendSystemMessage(Component.literal("§8[§bMisc§dMining§8]§f %s".formatted(message)).setStyle(Style.EMPTY.withClickEvent(new ClickEvent.RunCommand(command))));
+  }
+
   public static void sendCommandFromPlayer(String command) {
     if (Minecraft.getInstance().player != null) Minecraft.getInstance().player.connection.sendCommand(command);
   }
@@ -194,5 +226,12 @@ public class MiscMining implements ModInitializer {
 
   public boolean between(float num1, float num2, float num) {
     return num >= num1 && num2 >= num;
+  }
+
+  public static void log(String msg) {
+    MiscMining.LOGGER.info("[MiscMining] %s".formatted(msg));
+  }
+  public static void error(String msg) {
+    MiscMining.LOGGER.error("[MiscMining] %s".formatted(msg));
   }
 }

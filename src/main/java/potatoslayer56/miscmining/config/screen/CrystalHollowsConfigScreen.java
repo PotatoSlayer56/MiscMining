@@ -40,15 +40,19 @@ public class CrystalHollowsConfigScreen extends Screen{
     effectiveWindowHeight = Minecraft.getInstance().getWindow().getHeight() / guiScale;
 
     ToggleWidget crystalNotifyToggle = new ToggleWidget(14,32,20,20,Variables.crystalNotify);
-    StringWidget crystalNotifyTitle = new StringWidget(40,38,this.font.width("Crystal Notify"),this.font.lineHeight,Component.literal("Crystal Notify"),this.font);
-    StringWidget crystalNotifyDescription = new StringWidget(14,60,this.font.width("Send crystal progress in party chat"),this.font.lineHeight,Component.literal("Send crystal progress in party chat"),this.font);
+    StringWidget crystalNotifyTitle = stringWidget(40,38,"Crystal Notify");
+    StringWidget crystalNotifyDescription = stringWidget(14,60,"Send crystal progress in party chat");
     ToggleWidget profitShareToggle = new ToggleWidget(14,72,20,20,Variables.nucleusRunProfitShare);
-    StringWidget profitShareTitle = new StringWidget(40,78,this.font.width("Profit Share"),this.font.lineHeight,Component.literal("Profit Share"),this.font);
-    StringWidget profitShareDescription = new StringWidget(14,100,this.font.width("Sends SkyHanni's Nucleus Run profit calculation in party chat"),this.font.lineHeight,Component.literal("Sends SkyHanni's Nucleus Run profit calculation in party chat"),this.font);
+    StringWidget profitShareTitle = stringWidget(40,78,"Profit Share");
+    StringWidget profitShareDescription = stringWidget(14,100,"Sends SkyHanni's Nucleus Run profit calculation in party chat");
+    ToggleWidget lowToolsNotifyToggle = new ToggleWidget(14,112,20,20,Variables.lowToolsNotify);
+    StringWidget lowToolsNotifyTitle = stringWidget(40,118,"Low Tools Notify");
+    StringWidget lowToolsNotifyDescription = stringWidget(14,140,"Prompts you to refill on tools whenever you run out");
 
     Button backButton = Button.builder(Component.literal("Back"), (button -> {
       Variables.crystalNotify = crystalNotifyToggle.getState();
       Variables.nucleusRunProfitShare = profitShareToggle.getState();
+      Variables.lowToolsNotify = lowToolsNotifyToggle.getState();
       SaveLoad.save();
       Minecraft.getInstance().gui.setScreen(new MainConfigScreen(this.parent));
     })).bounds(30,(int) Math.floor(effectiveWindowHeight * 0.85),32,20).build();
@@ -59,6 +63,9 @@ public class CrystalHollowsConfigScreen extends Screen{
     this.addRenderableWidget(profitShareToggle);
     this.addRenderableWidget(profitShareTitle);
     this.addRenderableWidget(profitShareDescription);
+    this.addRenderableWidget(lowToolsNotifyToggle);
+    this.addRenderableWidget(lowToolsNotifyTitle);
+    this.addRenderableWidget(lowToolsNotifyDescription);
     this.addRenderableWidget(backButton);
   }
 
@@ -72,5 +79,9 @@ public class CrystalHollowsConfigScreen extends Screen{
   @Override
   public void onClose() {
     Minecraft.getInstance().gui.setScreen(this.parent);
+  }
+
+  private StringWidget stringWidget(int x, int y, String msg) {
+    return new StringWidget(x,y,this.font.width(msg),this.font.lineHeight,Component.literal(msg),this.font);
   }
 }

@@ -38,11 +38,15 @@ public class MiscConfigScreen extends Screen{
     effectiveWindowHeight = Minecraft.getInstance().getWindow().getHeight() / guiScale;
 
     ToggleWidget shamelessPlugToggle = new ToggleWidget(14,32,20,20, Variables.shamelessPlug);
-    StringWidget shamelessPlugTitle = new StringWidget(40,38,this.font.width("Shameless Plug"),this.font.lineHeight,Component.literal("Shameless Plug"),this.font);
-    StringWidget shamelessPlugDescription = new StringWidget(14,60,this.font.width("Advertises in party chat whenever the mod automatically warps"),this.font.lineHeight,Component.literal("Advertises in party chat whenever the mod automatically warps"),this.font);
+    StringWidget shamelessPlugTitle = stringWidget(40,38,"Shameless Plug");
+    StringWidget shamelessPlugDescription = stringWidget(14,60,"Advertises in party chat whenever the mod automatically warps");
+    ToggleWidget updateCheckerToggle = new ToggleWidget(14,72,20,20, Variables.updateChecker);
+    StringWidget updateCheckerTitle = stringWidget(40,78,"Update Checker");
+    StringWidget updateCheckerDescription = stringWidget(14,100,"Checks for new updates on launch");
 
     Button backButton = Button.builder(Component.literal("Back"), (button -> {
       Variables.shamelessPlug = shamelessPlugToggle.getState();
+      Variables.updateChecker = updateCheckerToggle.getState();
       SaveLoad.save();
       Minecraft.getInstance().gui.setScreen(new MainConfigScreen(this.parent));
     })).bounds(30,(int) Math.floor(effectiveWindowHeight * 0.85),32,20).build();
@@ -50,6 +54,9 @@ public class MiscConfigScreen extends Screen{
     this.addRenderableWidget(shamelessPlugToggle);
     this.addRenderableWidget(shamelessPlugTitle);
     this.addRenderableWidget(shamelessPlugDescription);
+    this.addRenderableWidget(updateCheckerToggle);
+    this.addRenderableWidget(updateCheckerTitle);
+    this.addRenderableWidget(updateCheckerDescription);
     this.addRenderableWidget(backButton);
   }
 
@@ -63,5 +70,9 @@ public class MiscConfigScreen extends Screen{
   @Override
   public void onClose() {
     Minecraft.getInstance().gui.setScreen(this.parent);
+  }
+
+  private StringWidget stringWidget(int x, int y, String msg) {
+    return new StringWidget(x,y,this.font.width(msg),this.font.lineHeight,Component.literal(msg),this.font);
   }
 }

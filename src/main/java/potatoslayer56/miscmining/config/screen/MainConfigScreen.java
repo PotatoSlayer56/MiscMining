@@ -3,9 +3,12 @@ package potatoslayer56.miscmining.config.screen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import org.jspecify.annotations.Nullable;
+import potatoslayer56.miscmining.MiscMining;
+import potatoslayer56.miscmining.config.Variables;
 
 
 public class MainConfigScreen extends Screen {
@@ -47,6 +50,13 @@ public class MainConfigScreen extends Screen {
       client.gui.setScreen(new MiscConfigScreen(this.parent));
     })).bounds(14,96,this.font.width("Lapis Corpse Counts")+16,this.font.lineHeight+8).build();
 
+    if (Variables.updateChecker) {
+      StringWidget currentVerDisplay = stringWidget(14,14, "Current Version: %s".formatted(MiscMining.version));
+      StringWidget lastestVerDisplay = stringWidget(134,14, "Latest Version: %s".formatted(MiscMining.latestVersion));
+      this.addRenderableWidget(currentVerDisplay);
+      this.addRenderableWidget(lastestVerDisplay);
+    }
+
     this.addRenderableWidget(lapisCorpseConfigButton);
     this.addRenderableWidget(crystalHollowsConfigButton);
     this.addRenderableWidget(miscConfigButton);
@@ -62,5 +72,9 @@ public class MainConfigScreen extends Screen {
   @Override
   public void onClose() {
     Minecraft.getInstance().gui.setScreen(this.parent);
+  }
+
+  private StringWidget stringWidget(int x, int y, String msg) {
+    return new StringWidget(x,y,this.font.width(msg),this.font.lineHeight,Component.literal(msg),this.font);
   }
 }

@@ -13,6 +13,8 @@
 - Crystal Notify - Notify your nucleus party on crystal progress
 - Shameless Plug - Advertise in party chat whenever the mod automatically warps someone
 - Nucleus Run Profit Share - Shares nucleus run profit in chat - needs skyhanni
+- Low tool notify - Prompts you to refill your inventory on tools when you run out
+- Update Checker - Checks for the latest version
 
 ## Commands
 - `/miscmining <subcommand>` this holds all non shaft party commands

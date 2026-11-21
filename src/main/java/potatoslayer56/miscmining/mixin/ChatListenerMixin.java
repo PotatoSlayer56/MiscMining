@@ -3,8 +3,15 @@ package potatoslayer56.miscmining.mixin;
 import net.hypixel.modapi.HypixelModAPI;
 import net.hypixel.modapi.packet.impl.serverbound.ServerboundPartyInfoPacket;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Overlay;
 import net.minecraft.client.multiplayer.chat.ChatListener;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -26,121 +33,127 @@ import static potatoslayer56.miscmining.config.Variables.*;
 @Mixin(ChatListener.class)
 public class ChatListenerMixin {
   @Inject(method="handleSystemMessage", at = @At("TAIL"))
-  private void shaftWarp(Component message, boolean remote, CallbackInfo ci) {
-    if (!waitingForJoin.isEmpty() && message.getString().contains("joined the party")) {
-      waitingForJoin.forEach(ign -> {
-        if (message.getString().contains(ign)) {
-          sendCommandFromPlayer("p warp");
-          if (shamelessPlug) {
-            ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-            scheduler.schedule(() -> { sendCommandFromPlayer("pc Automatically warped into 2l+ shaft by MiscMining"); }, 1000L, TimeUnit.MILLISECONDS);
-            scheduler.shutdown();
-          }
-        }
-      });
-    }
-  }
-
-  @Inject(method="handleSystemMessage", at = @At("TAIL"))
-  private void disbandAfterShaftWarp(Component message, boolean remote, CallbackInfo ci) {
-    if (!waitingForJoin.isEmpty() && message.getString().contains("entered the mineshaft")) {
-      waitingForJoin.forEach(ign -> {
-        if (message.getString().contains(ign)) {
-          waitingForJoin.remove(ign);
-        }
-        if (waitingForJoin.isEmpty()) {
-          sendCommandFromPlayer("p disband");
-        }
-      });
-    }
-  }
-
-  @Inject(method="handleSystemMessage", at = @At("TAIL"))
-  private void autoJoinShaft(Component message, boolean remote, CallbackInfo ci) {
-    if (inShaftParty) {
-      ShaftParty.shaftPartyMembers.forEach((member, type) -> {
-        if (message.getString().contains(member) && message.getString().contains("you to join their party")) {
-          HypixelModAPI.getInstance().sendPacket(new ServerboundPartyInfoPacket());
-          if (isInOtherParty) {
-            ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-            sendCommandFromPlayer("pc !reinvite");
-            scheduler.schedule(() -> { sendCommandFromPlayer("p leave"); },1000L, TimeUnit.MILLISECONDS);
-            scheduler.schedule(() -> { sendCommandFromPlayer("p %s".formatted(member)); },2000L, TimeUnit.MILLISECONDS);
-            scheduler.shutdown();
-          }
-          else {
-            sendCommandFromPlayer("p %s".formatted(member));
-          }
-        }
-      });
-    }
-  }
-
-  @Inject(method="handleSystemMessage", at = @At("TAIL"))
-  private void shaftDetection(Component message, boolean remote, CallbackInfo ci) {
-    if (message.getString().startsWith("§aYou are playing on profile:")) {
-      ModRenderPipeline.waypoints = new ArrayList<>();
-      atBalPosition = null;
-      balWaypoint = null;
-
-      HypixelModAPI.getInstance().sendPacket(new ServerboundPartyInfoPacket());
-      shaftType = getPlayerShaftType();
-
-      if (inShaftParty) {
-        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-        AtomicInteger x = new AtomicInteger();
-        shaftPartyMembers.forEach((member, type) -> {
-          if (shaftCategories.get(type).containsKey(shaftType) && getLapisCorpseCount() >= shaftCategories.get(type).get(shaftType)) {
-            scheduler.schedule(() -> {
-              sendCommandFromPlayer("p %s".formatted(member));
-              waitingForJoin.add(member);
-            }, 1000L * x.get(), TimeUnit.MILLISECONDS);
-            x.addAndGet(1);
+  private void messageHandling(Component message, boolean remote, CallbackInfo ci) {
+    if (!message.getString().contains("§9Party §8> ") && !message.getString().contains("§2Guild > ") && !message.getString().contains("§bCo-op > ")) {
+      if (!waitingForJoin.isEmpty() && message.getString().contains("joined the party")) {
+        waitingForJoin.forEach(ign -> {
+          if (message.getString().contains(ign)) {
+            sendCommandFromPlayer("p warp");
+            if (shamelessPlug) {
+              ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+              scheduler.schedule(() -> {
+                sendCommandFromPlayer("pc Automatically warped into 2l+ shaft by MiscMining");
+              }, 1000L, TimeUnit.MILLISECONDS);
+              scheduler.shutdown();
+            }
           }
         });
-        scheduler.shutdown();
-      } else if (inLapisParty && getLapisCorpseCount() >= 2) {
-        sendCommandFromPlayer("pc !pt");
-        waitingForPartyTransfer = true;
       }
-    }
-  }
 
-  @Inject(method="handleSystemMessage", at = @At("TAIL"))
-  private void autoWarpLapisParty(Component message, boolean remote, CallbackInfo ci) {
-    if (inLapisParty && waitingForPartyTransfer && message.getString().contains("The party was transferred to") && message.getString().contains(Minecraft.getInstance().player.nameAndId().name())) {
-      sendCommandFromPlayer("p warp");
-      if (shamelessPlug) {
-        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-        scheduler.schedule(() -> { sendCommandFromPlayer("pc Automatically warped into 2l+ shaft by MiscMining"); }, 1000L, TimeUnit.MILLISECONDS);
-        scheduler.shutdown();
+      if (!waitingForJoin.isEmpty() && message.getString().contains("entered the mineshaft")) {
+        waitingForJoin.forEach(ign -> {
+          if (message.getString().contains(ign)) {
+            waitingForJoin.remove(ign);
+          }
+          if (waitingForJoin.isEmpty()) {
+            sendCommandFromPlayer("p disband");
+          }
+        });
       }
-      waitingForPartyTransfer = false;
-    }
-  }
 
-  @Inject(method="handleSystemMessage", at = @At("TAIL"))
-  private void crystalNotify(Component message, boolean remote, CallbackInfo ci) {
-    if (crystalNotify) {
-      if (message.getString().contains("✦ CRYSTAL FOUND (1/5)")) {
-        sendCommandFromPlayer("pc 1/5");
-      } else if (message.getString().contains("✦ CRYSTAL FOUND (2/5)")) {
-        sendCommandFromPlayer("pc 2/5");
-      } else if (message.getString().contains("✦ CRYSTAL FOUND (3/5)")) {
-        sendCommandFromPlayer("pc 3/5");
-      } else if (message.getString().contains("✦ CRYSTAL FOUND (4/5)")) {
-        sendCommandFromPlayer("pc 4/5");
-      } else if (message.getString().contains("✦ CRYSTAL FOUND (5/5)")) {
-        sendCommandFromPlayer("pc 5/5");
+      if (inShaftParty) {
+        ShaftParty.shaftPartyMembers.forEach((member, type) -> {
+          if (message.getString().contains(member) && message.getString().contains("you to join their party")) {
+            HypixelModAPI.getInstance().sendPacket(new ServerboundPartyInfoPacket());
+            if (isInOtherParty) {
+              ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+              sendCommandFromPlayer("pc !reinvite");
+              scheduler.schedule(() -> {
+                sendCommandFromPlayer("p leave");
+              }, 1000L, TimeUnit.MILLISECONDS);
+              scheduler.schedule(() -> {
+                sendCommandFromPlayer("p %s".formatted(member));
+              }, 2000L, TimeUnit.MILLISECONDS);
+              scheduler.shutdown();
+            } else {
+              sendCommandFromPlayer("p %s".formatted(member));
+            }
+          }
+        });
       }
-    }
-  }
 
-  @Inject(method="handleSystemMessage", at = @At("TAIL"))
-  private void profitShare(Component message, boolean remote, CallbackInfo ci) {
-    if (nucleusRunProfitShare) {
-      if (message.getString().contains("[Skyhanni] Profit for Crystal Nucleus Run")) {
-        sendCommandFromPlayer("pc %s".formatted(message.getString().replace("§","")));
+      if (message.getString().startsWith("§aYou are playing on profile:")) {
+        ModRenderPipeline.waypoints = new ArrayList<>();
+        atBalPosition = null;
+        balWaypoint = null;
+
+        HypixelModAPI.getInstance().sendPacket(new ServerboundPartyInfoPacket());
+        shaftType = getPlayerShaftType();
+
+        if (inShaftParty) {
+          ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+          AtomicInteger x = new AtomicInteger();
+          shaftPartyMembers.forEach((member, type) -> {
+            if (shaftCategories.get(type).containsKey(shaftType) && getLapisCorpseCount() >= shaftCategories.get(type).get(shaftType)) {
+              scheduler.schedule(() -> {
+                sendCommandFromPlayer("p %s".formatted(member));
+                waitingForJoin.add(member);
+              }, 1000L * x.get(), TimeUnit.MILLISECONDS);
+              x.addAndGet(1);
+            }
+          });
+          scheduler.shutdown();
+        } else if (inLapisParty && getLapisCorpseCount() >= 2) {
+          sendCommandFromPlayer("pc !pt");
+          waitingForPartyTransfer = true;
+        }
+      }
+
+      if (inLapisParty && waitingForPartyTransfer && message.getString().contains("The party was transferred to") && message.getString().contains(Minecraft.getInstance().player.nameAndId().name())) {
+        sendCommandFromPlayer("p warp");
+        if (shamelessPlug) {
+          ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+          scheduler.schedule(() -> {
+            sendCommandFromPlayer("pc Automatically warped into 2l+ shaft by MiscMining");
+          }, 1000L, TimeUnit.MILLISECONDS);
+          scheduler.shutdown();
+        }
+        waitingForPartyTransfer = false;
+      }
+
+      if (crystalNotify) {
+        if (message.getString().contains("✦ CRYSTAL FOUND (1/5)")) {
+          sendCommandFromPlayer("pc 1/5");
+        } else if (message.getString().contains("✦ CRYSTAL FOUND (2/5)")) {
+          sendCommandFromPlayer("pc 2/5");
+        } else if (message.getString().contains("✦ CRYSTAL FOUND (3/5)")) {
+          sendCommandFromPlayer("pc 3/5");
+        } else if (message.getString().contains("✦ CRYSTAL FOUND (4/5)")) {
+          sendCommandFromPlayer("pc 4/5");
+        } else if (message.getString().contains("✦ CRYSTAL FOUND (5/5)")) {
+          sendCommandFromPlayer("pc 5/5");
+        }
+      }
+
+      if (nucleusRunProfitShare) {
+        if (message.getString().contains("[Skyhanni] Profit for Crystal Nucleus Run")) {
+          sendCommandFromPlayer("pc %s".formatted(message.getString().replace("§", "")));
+        }
+      }
+
+      if (lowToolsNotify) {
+        if (message.getString().contains("                                §aJade Crystal")) {
+          boolean hasTools = false;
+          for(int i = 0; i <= 36; i++) {
+            if (Minecraft.getInstance().player.getInventory().getItem(i).getCustomName().getString().contains("Scavenged Golden Hammer")) {
+              hasTools = true;
+            }
+          }
+          if (!hasTools) {
+            Minecraft.getInstance().gui.hud.setTitle(Component.literal("§c§lNo Tools"));
+            clientPrefixedCommandMessage("§c§l[OPEN STORAGE]", "/storage");
+          }
+        }
       }
     }
   }
