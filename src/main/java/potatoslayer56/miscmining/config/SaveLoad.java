@@ -19,6 +19,8 @@ public class SaveLoad {
     jsonData.put("shamelessplug", Variables.shamelessPlug);
     jsonData.put("lowtoolsnotify", Variables.lowToolsNotify);
     jsonData.put("updatechecker", Variables.updateChecker);
+    jsonData.put("nucrunpb", Variables.nucRunPB);
+    jsonData.put("moleremind", Variables.moleRemind);
     String jsonString = jsonData.toString();
     try {
       FileWriter fileWriter = new FileWriter(configPath);
@@ -47,6 +49,8 @@ public class SaveLoad {
       try { Variables.shamelessPlug = jsonData.getBoolean("shamelessplug"); } catch (JSONException e) { MiscMining.log("Entry missing from config"); }
       try { Variables.lowToolsNotify = jsonData.getBoolean("lowtoolsnotify"); } catch (JSONException e) { MiscMining.log("Entry missing from config"); }
       try { Variables.updateChecker = jsonData.getBoolean("updatechecker"); } catch (JSONException e) { MiscMining.log("Entry missing from config"); }
+      try { Variables.moleRemind = jsonData.getBoolean("moleremind"); } catch (JSONException e) { MiscMining.log("Entry missing from config"); }
+      try { Variables.nucRunPB = jsonData.getLong("nucrunpb"); } catch (JSONException e) { MiscMining.log("Entry missing from config"); }
 
       Variables.shaftLapisCounts = new HashMap<>();
 

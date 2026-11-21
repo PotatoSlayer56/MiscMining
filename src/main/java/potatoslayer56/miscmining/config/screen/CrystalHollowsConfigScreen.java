@@ -13,6 +13,7 @@ import potatoslayer56.miscmining.config.Variables;
 import java.util.HashMap;
 import java.util.Map;
 
+import static potatoslayer56.miscmining.config.Variables.nucRunPB;
 import static potatoslayer56.miscmining.config.screen.ScreenUtils.configOption;
 
 public class CrystalHollowsConfigScreen extends Screen{
@@ -47,6 +48,8 @@ public class CrystalHollowsConfigScreen extends Screen{
     widgetMap = configOption(114,14,"Crystal Notify","Send crystal progress in party chat",Variables.crystalNotify,widgetMap,this.font,"crystalnotify");
     widgetMap = configOption(114,54,"Profit Share","Sends SkyHanni's Nucleus Run profit calculation in party chat",Variables.nucleusRunProfitShare,widgetMap,this.font,"profitshare");
     widgetMap = configOption(114,94,"Low Tools Notify","Prompts you to refill on tools whenever you run out",Variables.lowToolsNotify,widgetMap,this.font,"lowtoolsnotify");
+    widgetMap = configOption(114,134,"Mole Reminder","Reminds you to equip mole after grabbing all 5 crystals",Variables.moleRemind,widgetMap,this.font,"moleremind");
+    widgetMap = configOption(114,174,"Nucleus Run PBs","Tracks your nucleus run pb - Current PB: %.2f".formatted(((float)nucRunPB)/1000),Variables.nucRunPBTracking,widgetMap,this.font,"nucrunpb");
 
     SidebarWidget sidebarWidget = new SidebarWidget(100, effectiveWindowHeight, ScreenUtils.CATEGORIES.CRYSTALHOLLOWS, this.font);
 
@@ -72,6 +75,8 @@ public class CrystalHollowsConfigScreen extends Screen{
     Variables.crystalNotify = ((ToggleWidget) widgetMap.get("crystalnotifytoggle")).getState();
     Variables.nucleusRunProfitShare = ((ToggleWidget) widgetMap.get("profitsharetoggle")).getState();
     Variables.lowToolsNotify = ((ToggleWidget) widgetMap.get("lowtoolsnotifytoggle")).getState();
+    Variables.moleRemind = ((ToggleWidget) widgetMap.get("moleremindtoggle")).getState();
+    Variables.nucRunPBTracking = ((ToggleWidget) widgetMap.get("nucrunpbtoggle")).getState();
     SaveLoad.save();
   }
 

@@ -13,6 +13,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -20,6 +21,9 @@ import potatoslayer56.miscmining.MiscMining;
 import potatoslayer56.miscmining.ShaftParty;
 import potatoslayer56.miscmining.rendering.ModRenderPipeline;
 
+import java.sql.Time;
+import java.time.Instant;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -33,6 +37,12 @@ import static potatoslayer56.miscmining.config.Variables.*;
 
 @Mixin(ChatListener.class)
 public class ChatListenerMixin {
+
+  @Unique
+  private static boolean nucRunActive;
+  @Unique
+  private static long nucRunStartTime;
+
   @Inject(method="handleSystemMessage", at = @At("TAIL"))
   private void messageHandling(Component message, boolean remote, CallbackInfo ci) {
     if (!message.getString().contains("§9Party §8> ") && !message.getString().contains("§2Guild > ") && !message.getString().contains("§bCo-op > ")) {
@@ -151,6 +161,33 @@ public class ChatListenerMixin {
             Minecraft.getInstance().gui.hud.setTitle(Component.literal("§c§lNo Tools"));
             clientPrefixedCommandMessage("§c§l[OPEN STORAGE]", "/storage");
           }
+        }
+      }
+
+      if (nucRunPBTracking) {
+        if (message.getString().contains("CRYSTAL NUCLEUS LOOT BUNDLE")) {
+          if (!nucRunActive) {
+            nucRunStartTime = Instant.now().toEpochMilli();
+            nucRunActive = true;
+          }
+          else {
+            long endTime = Instant.now().toEpochMilli();
+            long elapsed = endTime - nucRunStartTime;
+            if (elapsed < nucRunPB) {
+              nucRunPB = elapsed;
+              clientPrefixedMessage("Run took %fs (§d§lNEW PB§.2f)".formatted(((float)nucRunPB)/1000));
+            }
+            else {
+              clientPrefixedMessage("Run took %fs".formatted(((float)nucRunPB)/1000));
+            }
+          }
+        }
+      }
+
+      if (moleRemind) {
+        if (message.getString().contains("✦ CRYSTAL FOUND (5/5)")) {
+          Minecraft.getInstance().gui.hud.setTimes(5,20,5);
+          Minecraft.getInstance().gui.hud.setTitle(Component.literal("§c§lEquip Mole"));
         }
       }
     }

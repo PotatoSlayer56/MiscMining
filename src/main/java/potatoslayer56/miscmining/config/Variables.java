@@ -11,6 +11,9 @@ public class Variables {
   public static boolean nucleusRunProfitShare = false;
   public static boolean lowToolsNotify = false;
   public static boolean updateChecker = true;
+  public static boolean nucRunPBTracking = false;
+  public static long nucRunPB = 99999999;
+  public static boolean moleRemind = false;
 
   public static Map<String, Integer> defaultLapisCountsConfig() {
     Map<String, Integer> config = new HashMap<>();
