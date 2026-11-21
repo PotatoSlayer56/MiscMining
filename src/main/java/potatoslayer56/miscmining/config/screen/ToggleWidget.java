@@ -8,6 +8,9 @@ import net.minecraft.network.chat.Component;
 
 public class ToggleWidget extends AbstractWidget {
   private boolean state;
+  private final int onColour = 0xFF00FF00;
+  private final int offColour = 0xFFFF0000;
+  private final int backgroundColour = 0xFF3D3C42;
 
   public ToggleWidget(int x, int y, int width, int height, boolean state) {
     this.state = state;
@@ -21,9 +24,6 @@ public class ToggleWidget extends AbstractWidget {
 
   @Override
   protected void extractWidgetRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
-    int onColour = 0xFF00FF00;
-    int offColour = 0xFFFF0000;
-    int backgroundColour = 0xFF000000;
     graphics.fill(getX(),getY(),getX()+getWidth(),getY()+getHeight(),backgroundColour);
     if (this.state) {
       graphics.fill(getX()+2,getY()+2,getX()+getWidth()-2,getY()+getHeight()-2,onColour);

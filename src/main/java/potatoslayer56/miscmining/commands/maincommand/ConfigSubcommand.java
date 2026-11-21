@@ -2,6 +2,7 @@ package potatoslayer56.miscmining.commands.maincommand;
 
 import net.minecraft.client.Minecraft;
 import potatoslayer56.miscmining.commands.CustomCommand;
+import potatoslayer56.miscmining.config.screen.CrystalHollowsConfigScreen;
 import potatoslayer56.miscmining.config.screen.LapisCorpseCountConfigScreen;
 import potatoslayer56.miscmining.config.screen.MainConfigScreen;
 
@@ -11,7 +12,7 @@ public class ConfigSubcommand implements CustomCommand {
   @Override
   public void execute() {
     Minecraft.getInstance().execute(() -> {
-      Minecraft.getInstance().gui.setScreen(new MainConfigScreen(Minecraft.getInstance().gui.screen()));
+      Minecraft.getInstance().gui.setScreen(new CrystalHollowsConfigScreen(Minecraft.getInstance().gui.screen()));
     });
   }
 }

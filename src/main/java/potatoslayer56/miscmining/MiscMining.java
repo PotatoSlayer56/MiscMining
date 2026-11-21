@@ -3,6 +3,7 @@ package potatoslayer56.miscmining;
 import net.fabricmc.api.ModInitializer;
 
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.hypixel.modapi.HypixelModAPI;
 import net.hypixel.modapi.packet.impl.clientbound.ClientboundPartyInfoPacket;
@@ -33,6 +34,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+
+import static potatoslayer56.miscmining.config.Variables.nucleusRunProfitShare;
 
 
 public class MiscMining implements ModInitializer {
@@ -87,6 +90,7 @@ public class MiscMining implements ModInitializer {
     registerSubCommand("config", new ConfigSubcommand());
     registerSubCommand("togglelapisparty", new ToggleLapisParty());
     registerSubCommand("atbal", new AtBalCommand());
+    registerSubCommand("dev", new Dev());
 
     MainCommand.register();
     ShaftParty.init();
@@ -109,6 +113,16 @@ public class MiscMining implements ModInitializer {
         }
       }
     });
+
+    ClientReceiveMessageEvents.GAME.register(((message, b) -> {
+      if (!message.getString().contains("§9Party §8> ") && !message.getString().contains("§2Guild > ") && !message.getString().contains("§bCo-op > ")) {
+        if (nucleusRunProfitShare) {
+          if (message.getString().contains("[Skyhanni] Profit for Crystal Nucleus Run")) {
+            sendCommandFromPlayer("pc %s".formatted(message.getString().replace("§e", "").replace("§c", "").replace("§6", "")));
+          }
+        }
+      }
+    }));
 
     String fullJsonString = "";
     try {
@@ -224,8 +238,8 @@ public class MiscMining implements ModInitializer {
     subCommands.put(name, command);
   }
 
-  public boolean between(float num1, float num2, float num) {
-    return num >= num1 && num2 >= num;
+  public static boolean between(float p1, float p2, float num) {
+    return num >= p1 && p2 >= num;
   }
 
   public static void log(String msg) {

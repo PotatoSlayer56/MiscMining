@@ -16,6 +16,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import potatoslayer56.miscmining.MiscMining;
 import potatoslayer56.miscmining.ShaftParty;
 import potatoslayer56.miscmining.rendering.ModRenderPipeline;
 
@@ -135,21 +136,18 @@ public class ChatListenerMixin {
         }
       }
 
-      if (nucleusRunProfitShare) {
-        if (message.getString().contains("[Skyhanni] Profit for Crystal Nucleus Run")) {
-          sendCommandFromPlayer("pc %s".formatted(message.getString().replace("§", "")));
-        }
-      }
-
       if (lowToolsNotify) {
-        if (message.getString().contains("                                §aJade Crystal")) {
+        if (message.getString().contains("Jade Crystal")) {
           boolean hasTools = false;
           for(int i = 0; i <= 36; i++) {
-            if (Minecraft.getInstance().player.getInventory().getItem(i).getCustomName().getString().contains("Scavenged Golden Hammer")) {
-              hasTools = true;
+            if (Minecraft.getInstance().player.getInventory().getItem(i).getCustomName() != null && Minecraft.getInstance().player != null){
+              if (Minecraft.getInstance().player.getInventory().getItem(i).getCustomName().getString().contains("Scavenged Golden Hammer")) {
+                hasTools = true;
+              }
             }
           }
           if (!hasTools) {
+            Minecraft.getInstance().gui.hud.setTimes(5,20,5);
             Minecraft.getInstance().gui.hud.setTitle(Component.literal("§c§lNo Tools"));
             clientPrefixedCommandMessage("§c§l[OPEN STORAGE]", "/storage");
           }

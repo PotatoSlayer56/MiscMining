@@ -17,7 +17,7 @@ public class SaveLoad {
     jsonData.put("crystalnotify", Variables.crystalNotify);
     jsonData.put("profitshare", Variables.nucleusRunProfitShare);
     jsonData.put("shamelessplug", Variables.shamelessPlug);
-    jsonData.put("lowtoolnotify", Variables.lowToolsNotify);
+    jsonData.put("lowtoolsnotify", Variables.lowToolsNotify);
     jsonData.put("updatechecker", Variables.updateChecker);
     String jsonString = jsonData.toString();
     try {

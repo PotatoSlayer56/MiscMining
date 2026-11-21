@@ -2,7 +2,7 @@ package potatoslayer56.miscmining.config.screen;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -10,13 +10,18 @@ import org.jspecify.annotations.Nullable;
 import potatoslayer56.miscmining.config.SaveLoad;
 import potatoslayer56.miscmining.config.Variables;
 
-import static potatoslayer56.miscmining.ShaftParty.shaftCategories;
+import java.util.HashMap;
+import java.util.Map;
+
+import static potatoslayer56.miscmining.config.screen.ScreenUtils.configOption;
 
 public class CrystalHollowsConfigScreen extends Screen{
   private final @Nullable Screen parent;
 
   int effectiveWindowWidth;
   int effectiveWindowHeight;
+
+  static Map<String, AbstractWidget> widgetMap = new HashMap<>();
 
   Minecraft client;
 
@@ -39,46 +44,35 @@ public class CrystalHollowsConfigScreen extends Screen{
     effectiveWindowWidth = Minecraft.getInstance().getWindow().getWidth() / guiScale;
     effectiveWindowHeight = Minecraft.getInstance().getWindow().getHeight() / guiScale;
 
-    ToggleWidget crystalNotifyToggle = new ToggleWidget(14,32,20,20,Variables.crystalNotify);
-    StringWidget crystalNotifyTitle = stringWidget(40,38,"Crystal Notify");
-    StringWidget crystalNotifyDescription = stringWidget(14,60,"Send crystal progress in party chat");
-    ToggleWidget profitShareToggle = new ToggleWidget(14,72,20,20,Variables.nucleusRunProfitShare);
-    StringWidget profitShareTitle = stringWidget(40,78,"Profit Share");
-    StringWidget profitShareDescription = stringWidget(14,100,"Sends SkyHanni's Nucleus Run profit calculation in party chat");
-    ToggleWidget lowToolsNotifyToggle = new ToggleWidget(14,112,20,20,Variables.lowToolsNotify);
-    StringWidget lowToolsNotifyTitle = stringWidget(40,118,"Low Tools Notify");
-    StringWidget lowToolsNotifyDescription = stringWidget(14,140,"Prompts you to refill on tools whenever you run out");
+    widgetMap = configOption(114,14,"Crystal Notify","Send crystal progress in party chat",Variables.crystalNotify,widgetMap,this.font,"crystalnotify");
+    widgetMap = configOption(114,54,"Profit Share","Sends SkyHanni's Nucleus Run profit calculation in party chat",Variables.nucleusRunProfitShare,widgetMap,this.font,"profitshare");
+    widgetMap = configOption(114,94,"Low Tools Notify","Prompts you to refill on tools whenever you run out",Variables.lowToolsNotify,widgetMap,this.font,"lowtoolsnotify");
 
-    Button backButton = Button.builder(Component.literal("Back"), (button -> {
-      Variables.crystalNotify = crystalNotifyToggle.getState();
-      Variables.nucleusRunProfitShare = profitShareToggle.getState();
-      Variables.lowToolsNotify = lowToolsNotifyToggle.getState();
-      SaveLoad.save();
-      Minecraft.getInstance().gui.setScreen(new MainConfigScreen(this.parent));
-    })).bounds(30,(int) Math.floor(effectiveWindowHeight * 0.85),32,20).build();
+    SidebarWidget sidebarWidget = new SidebarWidget(100, effectiveWindowHeight, ScreenUtils.CATEGORIES.CRYSTALHOLLOWS, this.font);
 
-    this.addRenderableWidget(crystalNotifyToggle);
-    this.addRenderableWidget(crystalNotifyTitle);
-    this.addRenderableWidget(crystalNotifyDescription);
-    this.addRenderableWidget(profitShareToggle);
-    this.addRenderableWidget(profitShareTitle);
-    this.addRenderableWidget(profitShareDescription);
-    this.addRenderableWidget(lowToolsNotifyToggle);
-    this.addRenderableWidget(lowToolsNotifyTitle);
-    this.addRenderableWidget(lowToolsNotifyDescription);
-    this.addRenderableWidget(backButton);
+    widgetMap.forEach((label, value) -> {
+      this.addRenderableWidget(value);
+    });
+    this.addRenderableWidget(sidebarWidget);
   }
 
   @Override
   public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
-    graphics.fill(0, 0, effectiveWindowWidth, effectiveWindowHeight, 0xff3d3c42);
-    graphics.fill(4, 4, effectiveWindowWidth-4, effectiveWindowHeight-4, 0xff232226);
+    graphics.fill(100, 0, effectiveWindowWidth, effectiveWindowHeight, 0xff3d3c42);
+    graphics.fill(100, 4, effectiveWindowWidth-4, effectiveWindowHeight-4, 0xff232226);
     super.extractRenderState(graphics, mouseX, mouseY, delta);
   }
 
   @Override
   public void onClose() {
     Minecraft.getInstance().gui.setScreen(this.parent);
+  }
+
+  public static void save() {
+    Variables.crystalNotify = ((ToggleWidget) widgetMap.get("crystalnotifytoggle")).getState();
+    Variables.nucleusRunProfitShare = ((ToggleWidget) widgetMap.get("profitsharetoggle")).getState();
+    Variables.lowToolsNotify = ((ToggleWidget) widgetMap.get("lowtoolsnotifytoggle")).getState();
+    SaveLoad.save();
   }
 
   private StringWidget stringWidget(int x, int y, String msg) {

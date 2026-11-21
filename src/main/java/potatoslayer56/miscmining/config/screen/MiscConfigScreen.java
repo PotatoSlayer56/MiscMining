@@ -2,7 +2,7 @@ package potatoslayer56.miscmining.config.screen;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -10,11 +10,18 @@ import org.jspecify.annotations.Nullable;
 import potatoslayer56.miscmining.config.SaveLoad;
 import potatoslayer56.miscmining.config.Variables;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import static potatoslayer56.miscmining.config.screen.ScreenUtils.configOption;
+
 public class MiscConfigScreen extends Screen{
   private final @Nullable Screen parent;
 
   int effectiveWindowWidth;
   int effectiveWindowHeight;
+
+  static Map<String, AbstractWidget> widgetMap = new HashMap<>();
 
   Minecraft client;
 
@@ -37,27 +44,15 @@ public class MiscConfigScreen extends Screen{
     effectiveWindowWidth = Minecraft.getInstance().getWindow().getWidth() / guiScale;
     effectiveWindowHeight = Minecraft.getInstance().getWindow().getHeight() / guiScale;
 
-    ToggleWidget shamelessPlugToggle = new ToggleWidget(14,32,20,20, Variables.shamelessPlug);
-    StringWidget shamelessPlugTitle = stringWidget(40,38,"Shameless Plug");
-    StringWidget shamelessPlugDescription = stringWidget(14,60,"Advertises in party chat whenever the mod automatically warps");
-    ToggleWidget updateCheckerToggle = new ToggleWidget(14,72,20,20, Variables.updateChecker);
-    StringWidget updateCheckerTitle = stringWidget(40,78,"Update Checker");
-    StringWidget updateCheckerDescription = stringWidget(14,100,"Checks for new updates on launch");
+    SidebarWidget sidebarWidget = new SidebarWidget(100, effectiveWindowHeight, ScreenUtils.CATEGORIES.MISC, this.font);
 
-    Button backButton = Button.builder(Component.literal("Back"), (button -> {
-      Variables.shamelessPlug = shamelessPlugToggle.getState();
-      Variables.updateChecker = updateCheckerToggle.getState();
-      SaveLoad.save();
-      Minecraft.getInstance().gui.setScreen(new MainConfigScreen(this.parent));
-    })).bounds(30,(int) Math.floor(effectiveWindowHeight * 0.85),32,20).build();
+    widgetMap = configOption(114,14,"Shameless Plug","Advertises in party chat whenever the mod automatically warps",Variables.shamelessPlug,widgetMap,this.font,"shamelessplug");
+    widgetMap = configOption(114,54,"Update Checker","Checks for new updates on launch",Variables.updateChecker,widgetMap,this.font,"updatechecker");
 
-    this.addRenderableWidget(shamelessPlugToggle);
-    this.addRenderableWidget(shamelessPlugTitle);
-    this.addRenderableWidget(shamelessPlugDescription);
-    this.addRenderableWidget(updateCheckerToggle);
-    this.addRenderableWidget(updateCheckerTitle);
-    this.addRenderableWidget(updateCheckerDescription);
-    this.addRenderableWidget(backButton);
+    widgetMap.forEach((label, value) -> {
+      this.addRenderableWidget(value);
+    });
+    this.addRenderableWidget(sidebarWidget);
   }
 
   @Override
@@ -69,7 +64,14 @@ public class MiscConfigScreen extends Screen{
 
   @Override
   public void onClose() {
+    save();
     Minecraft.getInstance().gui.setScreen(this.parent);
+  }
+
+  public static void save() {
+    Variables.shamelessPlug = ((ToggleWidget)widgetMap.get("shamelessplugtoggle")).getState();
+    Variables.updateChecker = ((ToggleWidget)widgetMap.get("updatecheckertoggle")).getState();
+    SaveLoad.save();
   }
 
   private StringWidget stringWidget(int x, int y, String msg) {
