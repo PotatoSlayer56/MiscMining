@@ -46,7 +46,7 @@ public class MiscConfigScreen extends Screen{
 
     SidebarWidget sidebarWidget = new SidebarWidget(100, effectiveWindowHeight, ScreenUtils.CATEGORIES.MISC, this.font);
 
-    widgetMap = configOption(114,14,"Shameless Plug","Advertises in party chat whenever the mod automatically warps",Variables.shamelessPlug,widgetMap,this.font,"shamelessplug");
+    widgetMap = configOption(114,14,"Shameless Plug","Advertises whenever the mod sends something to party chat",Variables.shamelessPlug,widgetMap,this.font,"shamelessplug");
     widgetMap = configOption(114,54,"Update Checker","Checks for new updates on launch",Variables.updateChecker,widgetMap,this.font,"updatechecker");
 
     widgetMap.forEach((label, value) -> {

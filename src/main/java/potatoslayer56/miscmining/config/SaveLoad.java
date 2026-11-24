@@ -15,7 +15,6 @@ public class SaveLoad {
     JSONObject jsonData = new JSONObject();
     jsonData.put("lapiscorpses", Variables.shaftLapisCounts);
     jsonData.put("crystalnotify", Variables.crystalNotify);
-    jsonData.put("profitshare", Variables.nucleusRunProfitShare);
     jsonData.put("shamelessplug", Variables.shamelessPlug);
     jsonData.put("lowtoolsnotify", Variables.lowToolsNotify);
     jsonData.put("updatechecker", Variables.updateChecker);
@@ -45,7 +44,6 @@ public class SaveLoad {
       JSONObject jsonData = new JSONObject(data.toString());
 
       try { Variables.crystalNotify = jsonData.getBoolean("crystalnotify"); } catch (JSONException e) { MiscMining.log("Entry missing from config"); }
-      try { Variables.nucleusRunProfitShare = jsonData.getBoolean("profitshare"); } catch (JSONException e) { MiscMining.log("Entry missing from config"); }
       try { Variables.shamelessPlug = jsonData.getBoolean("shamelessplug"); } catch (JSONException e) { MiscMining.log("Entry missing from config"); }
       try { Variables.lowToolsNotify = jsonData.getBoolean("lowtoolsnotify"); } catch (JSONException e) { MiscMining.log("Entry missing from config"); }
       try { Variables.updateChecker = jsonData.getBoolean("updatechecker"); } catch (JSONException e) { MiscMining.log("Entry missing from config"); }

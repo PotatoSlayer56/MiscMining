@@ -53,6 +53,10 @@ jar {
 	}
 }
 
+loom {
+	accessWidenerPath = file("src/main/resources/misc-mining.classtweaker")
+}
+
 // configure the maven publication
 publishing {
 	publications {

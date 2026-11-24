@@ -1,22 +1,17 @@
 package potatoslayer56.miscmining.rendering;
 
-import com.mojang.blaze3d.PrimitiveTopology;
-import com.mojang.blaze3d.buffers.GpuBufferSlice;
-import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.pipeline.RenderTarget;
-import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.textures.GpuTextureView;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.blaze3d.vertex.VertexFormat;
-import net.fabricmc.api.ClientModInitializer;
+import com.mojang.renderpearl.api.buffers.GpuBufferSlice;
+import com.mojang.renderpearl.api.commands.RenderPass;
+import com.mojang.renderpearl.api.pipeline.PrimitiveTopology;
+import com.mojang.renderpearl.api.pipeline.RenderPipeline;
+import com.mojang.renderpearl.api.textures.GpuTextureView;
+import com.mojang.renderpearl.api.vertex.VertexFormat;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.client.rendering.v1.level.LevelExtractionContext;
-import net.fabricmc.fabric.api.client.rendering.v1.level.LevelExtractionEvents;
-import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext;
-import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
-import net.jpountz.xxhash.XXHash32;
+import net.fabricmc.fabric.api.client.rendering.v1.level.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.StagedVertexBuffer;
@@ -24,18 +19,19 @@ import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
+import org.joml.Matrix4fc;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
-import potatoslayer56.miscmining.MiscMining;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.OptionalDouble;
 
 import static potatoslayer56.miscmining.MiscMining.balWaypoint;
 
 public class ModRenderPipeline implements ModInitializer {
+  private static ModRenderPipeline instance;
+
   private static final RenderPipeline FILLED_THROUGH_WALLS = RenderPipelines.register(RenderPipeline.builder(RenderPipelines.DEBUG_FILLED_SNIPPET)
     .withLocation(Identifier.withDefaultNamespace("pipeline/filled_box_through_walls"))
     .withDepthStencilState(Optional.empty())
@@ -48,22 +44,29 @@ public class ModRenderPipeline implements ModInitializer {
   private static final Vector3f MODEL_OFFSET = new Vector3f();
   private static final Matrix4f TEXTURE_MATRIX = new Matrix4f();
   private static final StagedVertexBuffer STAGED_BUFFER = new StagedVertexBuffer(() -> "Waypoints Buffer", RenderType.SMALL_BUFFER_SIZE);
+  private StagedVertexBuffer.Draw draw;
 
   public enum waypointTypes {
     SINGLE,
     THREEBYTHREE
   }
 
+  public static ModRenderPipeline getInstance() {
+    return instance;
+  }
+
   @Override
   public void onInitialize() {
+    instance = this;
     LevelExtractionEvents.END_EXTRACTION.register(this::extractWaypoint);
-    LevelRenderEvents.AFTER_TRANSLUCENT_TERRAIN.register(this::renderAndDrawWaypoint);
+    LevelRenderEvents.BEFORE_RENDER_PASS.register(this::prepare);
+    LevelRenderEvents.END_MAIN.register(_ -> STAGED_BUFFER.endFrame());
   }
 
   private void extractWaypoint(LevelExtractionContext context) {
   }
 
-  private void renderAndDrawWaypoint(LevelRenderContext context) {
+  private void prepare(LevelTerrainRenderContext context) {
     RenderPipeline renderPipeline = ModRenderPipeline.FILLED_THROUGH_WALLS;
     VertexFormat formatBinding = renderPipeline.getVertexFormatBinding(0);
 
@@ -76,40 +79,31 @@ public class ModRenderPipeline implements ModInitializer {
 
     STAGED_BUFFER.upload();
 
-    StagedVertexBuffer.ExecuteInfo info = STAGED_BUFFER.getExecuteInfo(draw);
-
-    if (info != null) {
-      draw(Minecraft.getInstance(), info, renderPipeline);
-    }
-
-    STAGED_BUFFER.endFrame();
+    this.draw = draw;
   }
 
-  private void renderWaypoint(LevelRenderContext context, StagedVertexBuffer.Draw draw) {
-    PoseStack matrices = context.poseStack();
+  private void renderWaypoint(LevelTerrainRenderContext context, StagedVertexBuffer.Draw draw) {
+    Matrix4f matrix = new Matrix4f();
     Vec3 camera = context.levelState().cameraRenderState.pos;
 
-    matrices.pushPose();
-    matrices.translate(-camera.x, -camera.y, -camera.z);
+    matrix.translate((float) -camera.x, (float) -camera.y, (float) -camera.z);
 
     final VertexConsumer builder = STAGED_BUFFER.getVertexBuilder(draw);
 
     waypoints.forEach(waypointState -> {
       if (waypointState.type() == waypointTypes.SINGLE) {
-        this.renderFilledBox(matrices.last().pose(), builder, waypointState.x(), waypointState.y(), waypointState.z(), waypointState.x() + 1, waypointState.y() + 1, waypointState.z() + 1, waypointState.r(), waypointState.g(), waypointState.b(), waypointState.a());
+        this.renderFilledBox(matrix, builder, waypointState.x(), waypointState.y(), waypointState.z(), waypointState.x() + 1, waypointState.y() + 1, waypointState.z() + 1, waypointState.r(), waypointState.g(), waypointState.b(), waypointState.a());
       } else if (waypointState.type() == waypointTypes.THREEBYTHREE) {
-        this.renderOutlinedBox(matrices.last().pose(), builder, waypointState.x() - 1, waypointState.y(), waypointState.z() - 1, waypointState.x() + 2, waypointState.y() + 0.25f, waypointState.z() + 2, waypointState.r(), waypointState.g(), waypointState.b(), waypointState.a());
+        this.renderOutlinedBox(matrix, builder, waypointState.x() - 1, waypointState.y(), waypointState.z() - 1, waypointState.x() + 2, waypointState.y() + 0.25f, waypointState.z() + 2, waypointState.r(), waypointState.g(), waypointState.b(), waypointState.a());
       }
     });
 
     if (balWaypoint != null){
-      this.renderOutlinedBox(matrices.last().pose(), builder, balWaypoint.x() - 1, balWaypoint.y(), balWaypoint.z() - 1, balWaypoint.x() + 2, balWaypoint.y() + 0.25f, balWaypoint.z() + 2, balWaypoint.r(), balWaypoint.g(), balWaypoint.b(), balWaypoint.a());
+      this.renderOutlinedBox(matrix, builder, balWaypoint.x() - 1, balWaypoint.y(), balWaypoint.z() - 1, balWaypoint.x() + 2, balWaypoint.y() + 0.25f, balWaypoint.z() + 2, balWaypoint.r(), balWaypoint.g(), balWaypoint.b(), balWaypoint.a());
     }
-
-    matrices.popPose();
   }
 
-  private void renderOutlinedBox(Matrix4f positionMatrix, VertexConsumer buffer, float minX, float minY, float minZ, float maxX, float maxY, float maxZ, float red, float green, float blue, float alpha) {
+  private void renderOutlinedBox(Matrix4fc positionMatrix, VertexConsumer buffer, float minX, float minY, float minZ, float maxX, float maxY, float maxZ, float red, float green, float blue, float alpha) {
     // Sides
     renderFilledBox(positionMatrix, buffer, minX, minY, minZ, minX + 0.05f, maxY, minZ + 0.05f, red, green, blue, alpha);
     renderFilledBox(positionMatrix, buffer, maxX, minY, minZ, maxX - 0.05f, maxY, minZ + 0.05f, red, green, blue, alpha);
@@ -129,7 +123,7 @@ public class ModRenderPipeline implements ModInitializer {
     renderFilledBox(positionMatrix, buffer, maxX, minY, minZ, maxX - 0.05f, minY + 0.05f, maxZ, red, green, blue, alpha);
   }
 
-  private void renderFilledBox(Matrix4f positionMatrix, VertexConsumer buffer, float minX, float minY, float minZ, float maxX, float maxY, float maxZ, float red, float green, float blue, float alpha) {
+  private void renderFilledBox(Matrix4fc positionMatrix, VertexConsumer buffer, float minX, float minY, float minZ, float maxX, float maxY, float maxZ, float red, float green, float blue, float alpha) {
     // Front Face
     buffer.addVertex(positionMatrix, minX, minY, maxZ).setColor(red, green, blue, alpha);
     buffer.addVertex(positionMatrix, maxX, minY, maxZ).setColor(red, green, blue, alpha);
@@ -167,28 +161,36 @@ public class ModRenderPipeline implements ModInitializer {
     buffer.addVertex(positionMatrix, minX, minY, maxZ).setColor(red, green, blue, alpha);
   }
 
-  private static void draw(Minecraft client, StagedVertexBuffer.ExecuteInfo info, RenderPipeline pipeline) {
+  public void draw(RenderPass renderPass) {
+    if (this.draw == null) {
+      return;
+    }
+
+    StagedVertexBuffer.ExecuteInfo info = STAGED_BUFFER.getExecuteInfo(this.draw);
+
+    if (info == null) {
+      return;
+    }
+
     GpuBufferSlice dynamicTransforms = RenderSystem.getDynamicUniforms()
       .writeTransform(RenderSystem.getModelViewMatrixCopy(), COLOR_MODULATOR, MODEL_OFFSET, TEXTURE_MATRIX);
 
-    RenderTarget mainTarget = client.gameRenderer.mainRenderTarget();
-    GpuTextureView colorTexture = mainTarget.getColorTextureView();
+    renderPass.pushDebugGroup(() -> "Fabric Docs Example Pipeline Rendering");
+    renderPass.setPipeline(RenderSystem.getCompiledPipeline(FILLED_THROUGH_WALLS));
 
-    assert colorTexture != null;
+    RenderSystem.bindDefaultUniforms(renderPass);
+    renderPass.setUniform("DynamicTransforms", dynamicTransforms);
 
-    try (RenderPass renderPass = RenderSystem.getDevice()
-      .createCommandEncoder()
-      .createRenderPass(() -> MiscMining.MOD_ID + " render pipeline rendering", colorTexture, Optional.empty(), mainTarget.getDepthTextureView(), OptionalDouble.empty())) {
-      renderPass.setPipeline(pipeline);
+    // Bind texture if applicable:
+    // Sampler0 is used for texture inputs in vertices
+    // renderPass.setUniform("Sampler0", draw.textureSetup.texure0(), draw.textureSetup.sampler0());
 
-      RenderSystem.bindDefaultUniforms(renderPass);
-      renderPass.setUniform("DynamicTransforms", dynamicTransforms);
+    renderPass.setVertexBuffer(0, info.vertexBuffer().slice());
+    renderPass.setIndexBuffer(info.indexBuffer(), info.indexType());
 
-      renderPass.setVertexBuffer(0, info.vertexBuffer().slice());
-      renderPass.setIndexBuffer(info.indexBuffer(), info.indexType());
-
-      renderPass.drawIndexed(info.indexCount(), 1, info.firstIndex(), info.baseVertex(), 0);
-    }
+    // The base vertex is the starting index when we copied the data into the vertex buffer divided by vertex size
+    renderPass.drawIndexed(info.indexCount(), 1, info.firstIndex(), info.baseVertex(), 0);
+    renderPass.popDebugGroup();
   }
   // #endregion custom_pipelines_drawing_phase
 

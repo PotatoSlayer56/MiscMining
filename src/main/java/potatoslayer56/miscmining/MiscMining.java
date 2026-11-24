@@ -3,7 +3,6 @@ package potatoslayer56.miscmining;
 import net.fabricmc.api.ModInitializer;
 
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.hypixel.modapi.HypixelModAPI;
 import net.hypixel.modapi.packet.impl.clientbound.ClientboundPartyInfoPacket;
@@ -23,6 +22,7 @@ import potatoslayer56.miscmining.commands.*;
 import potatoslayer56.miscmining.commands.maincommand.*;
 import potatoslayer56.miscmining.commands.shaftparty.ShaftMiningCommand;
 import potatoslayer56.miscmining.config.SaveLoad;
+import potatoslayer56.miscmining.config.Variables;
 import potatoslayer56.miscmining.partyfinder.PartyFinder;
 import potatoslayer56.miscmining.rendering.ModRenderPipeline;
 
@@ -35,8 +35,6 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import static potatoslayer56.miscmining.config.Variables.nucleusRunProfitShare;
-
 
 public class MiscMining implements ModInitializer {
   public static final String MOD_ID = "misc-mining";
@@ -45,11 +43,13 @@ public class MiscMining implements ModInitializer {
   public static JSONObject bazaarProducts;
 
   public static String version = FabricLoader.getInstance().getModContainer(MOD_ID).map(modContainer -> modContainer.getMetadata().getVersion().getFriendlyString()).orElse("unknown");
-  public static String latestVersion = "1.7";
+  public static String latestVersion = "1";
 
   public static float locketPrice;
   public static float wispPrice;
   public static float frostDyePrice;
+
+  public static boolean sentUpdateNotification = false;
 
   public static ModRenderPipeline.WaypointRenderState balWaypoint = null;
   public static int[] atBalPosition = null;
@@ -104,7 +104,7 @@ public class MiscMining implements ModInitializer {
         Vec3 pos = client.player.position();
         if (between(atBalPosition[0], atBalPosition[3], (float) pos.x()) && between(atBalPosition[1], atBalPosition[4], (float) pos.y()) && between(atBalPosition[2], atBalPosition[5], (float) pos.z())) {
           if (!inBalPosition) {
-            sendCommandFromPlayer("pc at bal");
+            sendToPartyChat("at bal");
           }
           inBalPosition = true;
         }
@@ -113,16 +113,6 @@ public class MiscMining implements ModInitializer {
         }
       }
     });
-
-    ClientReceiveMessageEvents.GAME.register(((message, b) -> {
-      if (!message.getString().contains("§9Party §8> ") && !message.getString().contains("§2Guild > ") && !message.getString().contains("§bCo-op > ")) {
-        if (nucleusRunProfitShare) {
-          if (message.getString().contains("[Skyhanni] Profit for Crystal Nucleus Run")) {
-            sendCommandFromPlayer("pc %s".formatted(message.getString().replace("§e", "").replace("§c", "").replace("§6", "")));
-          }
-        }
-      }
-    }));
 
     String fullJsonString = "";
     try {
@@ -232,6 +222,17 @@ public class MiscMining implements ModInitializer {
 
   public static void sendCommandFromPlayer(String command) {
     if (Minecraft.getInstance().player != null) Minecraft.getInstance().player.connection.sendCommand(command);
+  }
+
+  public static void sendToPartyChat(String msg) {
+    if (Minecraft.getInstance().player != null) {
+      if (Variables.shamelessPlug) {
+        Minecraft.getInstance().player.connection.sendCommand("pc [MiscMining] %s".formatted(msg));
+      }
+      else {
+        Minecraft.getInstance().player.connection.sendCommand("pc %s".formatted(msg));
+      }
+    }
   }
 
   public static void registerSubCommand(String name, CustomCommand command) {

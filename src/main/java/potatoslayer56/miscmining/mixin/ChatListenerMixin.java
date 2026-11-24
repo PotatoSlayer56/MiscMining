@@ -25,6 +25,7 @@ import java.sql.Time;
 import java.time.Instant;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -53,7 +54,7 @@ public class ChatListenerMixin {
             if (shamelessPlug) {
               ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
               scheduler.schedule(() -> {
-                sendCommandFromPlayer("pc Automatically warped into 2l+ shaft by MiscMining");
+                sendToPartyChat("Automatically warped into 2l+ shaft");
               }, 1000L, TimeUnit.MILLISECONDS);
               scheduler.shutdown();
             }
@@ -78,7 +79,7 @@ public class ChatListenerMixin {
             HypixelModAPI.getInstance().sendPacket(new ServerboundPartyInfoPacket());
             if (isInOtherParty) {
               ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-              sendCommandFromPlayer("pc !reinvite");
+              sendToPartyChat("!reinvite");
               scheduler.schedule(() -> {
                 sendCommandFromPlayer("p leave");
               }, 1000L, TimeUnit.MILLISECONDS);
@@ -98,6 +99,11 @@ public class ChatListenerMixin {
         atBalPosition = null;
         balWaypoint = null;
 
+        if (updateChecker && !sentUpdateNotification && !Objects.equals(latestVersion, version)){
+          clientPrefixedMessage("New version available! Your version: %s Latest Version: %s".formatted(version,latestVersion));
+          sentUpdateNotification = true;
+        }
+
         HypixelModAPI.getInstance().sendPacket(new ServerboundPartyInfoPacket());
         shaftType = getPlayerShaftType();
 
@@ -115,7 +121,7 @@ public class ChatListenerMixin {
           });
           scheduler.shutdown();
         } else if (inLapisParty && getLapisCorpseCount() >= 2) {
-          sendCommandFromPlayer("pc !pt");
+          sendToPartyChat("!pt");
           waitingForPartyTransfer = true;
         }
       }
@@ -125,7 +131,7 @@ public class ChatListenerMixin {
         if (shamelessPlug) {
           ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
           scheduler.schedule(() -> {
-            sendCommandFromPlayer("pc Automatically warped into 2l+ shaft by MiscMining");
+            sendToPartyChat("Automatically warped into 2l+ shaft");
           }, 1000L, TimeUnit.MILLISECONDS);
           scheduler.shutdown();
         }
@@ -134,15 +140,15 @@ public class ChatListenerMixin {
 
       if (crystalNotify) {
         if (message.getString().contains("✦ CRYSTAL FOUND (1/5)")) {
-          sendCommandFromPlayer("pc 1/5");
+          sendToPartyChat("1/5");
         } else if (message.getString().contains("✦ CRYSTAL FOUND (2/5)")) {
-          sendCommandFromPlayer("pc 2/5");
+          sendToPartyChat("2/5");
         } else if (message.getString().contains("✦ CRYSTAL FOUND (3/5)")) {
-          sendCommandFromPlayer("pc 3/5");
+          sendToPartyChat("3/5");
         } else if (message.getString().contains("✦ CRYSTAL FOUND (4/5)")) {
-          sendCommandFromPlayer("pc 4/5");
+          sendToPartyChat("4/5");
         } else if (message.getString().contains("✦ CRYSTAL FOUND (5/5)")) {
-          sendCommandFromPlayer("pc 5/5");
+          sendToPartyChat("5/5");
         }
       }
 
@@ -175,10 +181,10 @@ public class ChatListenerMixin {
             long elapsed = endTime - nucRunStartTime;
             if (elapsed < nucRunPB) {
               nucRunPB = elapsed;
-              clientPrefixedMessage("Run took %fs (§d§lNEW PB§.2f)".formatted(((float)nucRunPB)/1000));
+              clientPrefixedMessage("Run took %.2fs (§d§lNEW PB§f)".formatted(((float)nucRunPB)/1000));
             }
             else {
-              clientPrefixedMessage("Run took %fs".formatted(((float)nucRunPB)/1000));
+              clientPrefixedMessage("Run took %.2fs".formatted(((float)nucRunPB)/1000));
             }
           }
         }

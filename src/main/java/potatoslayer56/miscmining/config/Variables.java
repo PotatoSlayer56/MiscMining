@@ -8,7 +8,6 @@ public class Variables {
 
   public static boolean shamelessPlug = false;
   public static boolean crystalNotify = false;
-  public static boolean nucleusRunProfitShare = false;
   public static boolean lowToolsNotify = false;
   public static boolean updateChecker = true;
   public static boolean nucRunPBTracking = false;
@@ -49,6 +48,5 @@ public class Variables {
     shaftLapisCounts = defaultLapisCountsConfig();
     shamelessPlug = false;
     crystalNotify = false;
-    nucleusRunProfitShare = false;
   }
 }
