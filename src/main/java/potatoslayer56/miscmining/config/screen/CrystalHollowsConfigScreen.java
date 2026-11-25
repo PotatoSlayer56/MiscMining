@@ -49,6 +49,8 @@ public class CrystalHollowsConfigScreen extends Screen{
     widgetMap = configOption(114,54,"Nucleus Run PBs","Tracks your nucleus run pb - Current PB: %.2f".formatted(((float)nucRunPB)/1000),Variables.nucRunPBTracking,widgetMap,this.font,"nucrunpb");
     widgetMap = configOption(114,94,"Low Tools Notify","Prompts you to refill on tools whenever you run out",Variables.lowToolsNotify,widgetMap,this.font,"lowtoolsnotify");
     widgetMap = configOption(114,134,"Mole Reminder","Reminds you to equip mole after grabbing all 5 crystals",Variables.moleRemind,widgetMap,this.font,"moleremind");
+    widgetMap = configOption(114,174,"Day Counter","Shows you the current day, green = safe to leave",Variables.dayCounter,widgetMap,this.font,"daycounter");
+    widgetMap = configOption(114,214,"Bal Spawning Message","Send 'bal spawning' to party chat when bal is spawning",Variables.balSpawningMessage,widgetMap,this.font,"balspawning");
 
     SidebarWidget sidebarWidget = new SidebarWidget(100, effectiveWindowHeight, ScreenUtils.CATEGORIES.CRYSTALHOLLOWS, this.font);
 
@@ -67,6 +69,7 @@ public class CrystalHollowsConfigScreen extends Screen{
 
   @Override
   public void onClose() {
+    save();
     Minecraft.getInstance().gui.setScreen(this.parent);
   }
 
@@ -75,6 +78,8 @@ public class CrystalHollowsConfigScreen extends Screen{
     Variables.lowToolsNotify = ((ToggleWidget) widgetMap.get("lowtoolsnotifytoggle")).getState();
     Variables.moleRemind = ((ToggleWidget) widgetMap.get("moleremindtoggle")).getState();
     Variables.nucRunPBTracking = ((ToggleWidget) widgetMap.get("nucrunpbtoggle")).getState();
+    Variables.dayCounter = ((ToggleWidget) widgetMap.get("daycountertoggle")).getState();
+    Variables.balSpawningMessage = ((ToggleWidget) widgetMap.get("balspawningtoggle")).getState();
     SaveLoad.save();
   }
 

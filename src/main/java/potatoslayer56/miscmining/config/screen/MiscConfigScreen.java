@@ -48,6 +48,7 @@ public class MiscConfigScreen extends Screen{
 
     widgetMap = configOption(114,14,"Shameless Plug","Advertises whenever the mod sends something to party chat",Variables.shamelessPlug,widgetMap,this.font,"shamelessplug");
     widgetMap = configOption(114,54,"Update Checker","Checks for new updates on launch",Variables.updateChecker,widgetMap,this.font,"updatechecker");
+    widgetMap = configOption(114,94,"Parse Chat Waypoints","Takes waypoints from chat and adds them",Variables.parseChatWaypoints,widgetMap,this.font,"chatwaypoints");
 
     widgetMap.forEach((label, value) -> {
       this.addRenderableWidget(value);
@@ -71,6 +72,7 @@ public class MiscConfigScreen extends Screen{
   public static void save() {
     Variables.shamelessPlug = ((ToggleWidget)widgetMap.get("shamelessplugtoggle")).getState();
     Variables.updateChecker = ((ToggleWidget)widgetMap.get("updatecheckertoggle")).getState();
+    Variables.parseChatWaypoints = ((ToggleWidget)widgetMap.get("chatwaypointstoggle")).getState();
     SaveLoad.save();
   }
 

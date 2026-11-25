@@ -3,33 +3,25 @@ package potatoslayer56.miscmining.mixin;
 import net.hypixel.modapi.HypixelModAPI;
 import net.hypixel.modapi.packet.impl.serverbound.ServerboundPartyInfoPacket;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.Overlay;
 import net.minecraft.client.multiplayer.chat.ChatListener;
-import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
-import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import potatoslayer56.miscmining.MiscMining;
 import potatoslayer56.miscmining.ShaftParty;
 import potatoslayer56.miscmining.rendering.ModRenderPipeline;
 
-import java.sql.Time;
 import java.time.Instant;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static potatoslayer56.miscmining.MiscMining.*;
 import static potatoslayer56.miscmining.ShaftParty.*;
@@ -195,6 +187,28 @@ public class ChatListenerMixin {
           Minecraft.getInstance().gui.hud.setTimes(5,20,5);
           Minecraft.getInstance().gui.hud.setTitle(Component.literal("§c§lEquip Mole"));
         }
+      }
+
+      if (balSpawningMessage) {
+        if (message.getString().contains("The ground starts to shake and the lava bubbles")) {
+          sendToPartyChat("bal spawning");
+        }
+      }
+    }
+
+    if (parseChatWaypoints) {
+      Pattern pattern = Pattern.compile("\\{MiscMiningWP-x:\\d{3}-y:\\d{3}-z:\\d{3}\\}");
+      Matcher matcher = pattern.matcher(message.getString());
+      if (matcher.find()){
+        String wpMessage = matcher.group(0);
+        String[] splits = wpMessage.split("-");
+        String xString = splits[1].replace("x:","");
+        String yString = splits[2].replace("y:","");
+        String zString = splits[3].replace("z:","").replace("}","");
+        int x = Integer.parseInt(xString);
+        int y = Integer.parseInt(yString);
+        int z = Integer.parseInt(zString);
+        ModRenderPipeline.waypoints.add(new ModRenderPipeline.WaypointRenderState(x,y,z,0f,0f,1f,1f, ModRenderPipeline.waypointTypes.SINGLE));
       }
     }
   }

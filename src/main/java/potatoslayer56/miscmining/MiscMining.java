@@ -3,6 +3,8 @@ package potatoslayer56.miscmining;
 import net.fabricmc.api.ModInitializer;
 
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 import net.fabricmc.loader.api.FabricLoader;
 import net.hypixel.modapi.HypixelModAPI;
 import net.hypixel.modapi.packet.impl.clientbound.ClientboundPartyInfoPacket;
@@ -25,6 +27,7 @@ import potatoslayer56.miscmining.config.SaveLoad;
 import potatoslayer56.miscmining.config.Variables;
 import potatoslayer56.miscmining.partyfinder.PartyFinder;
 import potatoslayer56.miscmining.rendering.ModRenderPipeline;
+import potatoslayer56.miscmining.rendering.hud.DayCounterHudElement;
 
 import java.io.BufferedReader;
 
@@ -88,9 +91,9 @@ public class MiscMining implements ModInitializer {
     registerSubCommand("partyfinder", new PartyFinderCommand());
     registerSubCommand("junglecheese", new JungleCheese());
     registerSubCommand("config", new ConfigSubcommand());
-    registerSubCommand("togglelapisparty", new ToggleLapisParty());
     registerSubCommand("atbal", new AtBalCommand());
-    registerSubCommand("dev", new Dev());
+    registerSubCommand("hud", new HudCommand());
+    //registerSubCommand("dev", new Dev());
 
     MainCommand.register();
     ShaftParty.init();
@@ -98,6 +101,8 @@ public class MiscMining implements ModInitializer {
     PartyFinder.init();
 
     SaveLoad.load();
+
+    HudElementRegistry.attachElementBefore(VanillaHudElements.CHAT, id("day_counter"), DayCounterHudElement::register);
 
     ClientTickEvents.END_CLIENT_TICK.register((client) -> {
       if (client.player != null && atBalPosition != null){
@@ -127,7 +132,7 @@ public class MiscMining implements ModInitializer {
       }
       in.close();
     } catch (Exception e) {
-      e.printStackTrace();
+      MiscMining.log(e.toString());
     }
     try {
       JSONArray jsonData = new JSONArray(fullJsonString);
@@ -156,7 +161,7 @@ public class MiscMining implements ModInitializer {
       }
       in.close();
     } catch (Exception e) {
-      e.printStackTrace();
+      MiscMining.log(e.toString());
     }
     return fullJsonString;
   }
@@ -182,7 +187,7 @@ public class MiscMining implements ModInitializer {
       return lbinData.getJSONObject(0).getFloat("startingBid");
 
     } catch (Exception e) {
-      e.printStackTrace();
+      MiscMining.log(e.toString());
     }
 
     return 0;
@@ -246,6 +251,7 @@ public class MiscMining implements ModInitializer {
   public static void log(String msg) {
     MiscMining.LOGGER.info("[MiscMining] %s".formatted(msg));
   }
+
   public static void error(String msg) {
     MiscMining.LOGGER.error("[MiscMining] %s".formatted(msg));
   }

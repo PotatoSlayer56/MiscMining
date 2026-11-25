@@ -88,7 +88,7 @@ public class LapisCorpseCountConfigScreen extends Screen {
         shaftCategories.get("GEMS").put(type, count);
       });
       SaveLoad.save();
-      Minecraft.getInstance().gui.setScreen(new MainConfigScreen(this.parent));
+      Minecraft.getInstance().gui.setScreen(this.parent);
     })).bounds(
       30,
       (int) Math.floor(effectiveWindowHeight * 0.85),

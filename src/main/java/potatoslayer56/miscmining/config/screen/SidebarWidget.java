@@ -29,13 +29,18 @@ public class SidebarWidget extends AbstractWidget {
   public void onClick(MouseButtonEvent event, boolean doubleClick) {
     if (between(4,getWidth()-4,(float) event.x()) && between(4,44,(float) event.y()) && this.activeCategory != ScreenUtils.CATEGORIES.CRYSTALHOLLOWS) {
       Minecraft.getInstance().gui.setScreen(new CrystalHollowsConfigScreen(null));
-      CrystalHollowsConfigScreen.save();
-      MiscConfigScreen.save();
+      try { GlaciteTunnelsConfigScreen.save(); } catch (NullPointerException _) {}
+      try { MiscConfigScreen.save(); } catch (NullPointerException _) {}
     }
-    else if (between(4,getWidth()-4,(float) event.x()) && between(48,88,(float) event.y()) && this.activeCategory != ScreenUtils.CATEGORIES.MISC) {
+    else if (between(4,getWidth()-4,(float) event.x()) && between(48,88,(float) event.y()) && this.activeCategory != ScreenUtils.CATEGORIES.GLACITETUNNELS) {
+      Minecraft.getInstance().gui.setScreen(new GlaciteTunnelsConfigScreen(null));
+      try { CrystalHollowsConfigScreen.save(); } catch (NullPointerException _) {}
+      try { MiscConfigScreen.save(); } catch (NullPointerException _) {}
+    }
+    else if (between(4,getWidth()-4,(float) event.x()) && between(92,132,(float) event.y()) && this.activeCategory != ScreenUtils.CATEGORIES.MISC) {
       Minecraft.getInstance().gui.setScreen(new MiscConfigScreen(null));
-      CrystalHollowsConfigScreen.save();
-      MiscConfigScreen.save();
+      try { CrystalHollowsConfigScreen.save(); } catch (NullPointerException _) {}
+      try { GlaciteTunnelsConfigScreen.save(); } catch (NullPointerException _) {}
     }
   }
 
@@ -46,10 +51,17 @@ public class SidebarWidget extends AbstractWidget {
       case CRYSTALHOLLOWS -> {
         graphics.fill(4,4,getWidth()-4,44,activeColour);
         graphics.fill(4,48,getWidth()-4,88,inactiveColour);
+        graphics.fill(4,92,getWidth()-4,132,inactiveColour);
+      }
+      case GLACITETUNNELS -> {
+        graphics.fill(4,4,getWidth()-4,44,inactiveColour);
+        graphics.fill(4,48,getWidth()-4,88,activeColour);
+        graphics.fill(4,92,getWidth()-4,132,inactiveColour);
       }
       case MISC -> {
         graphics.fill(4,4,getWidth()-4,44,inactiveColour);
-        graphics.fill(4,48,getWidth()-4,88,activeColour);
+        graphics.fill(4,48,getWidth()-4,88,inactiveColour);
+        graphics.fill(4,92,getWidth()-4,132,activeColour);
       }
     }
     if (Variables.updateChecker) {
@@ -59,7 +71,8 @@ public class SidebarWidget extends AbstractWidget {
       graphics.text(this.font,"Latest: %s".formatted(latestVersion),8,getHeight()-16,0xFFFFFFFF);
     }
     graphics.text(this.font,"Crystal Hollows",8,4+(40-this.font.lineHeight)/2,0xFFFFFFFF);
-    graphics.text(this.font,"Misc",8,48+(40-this.font.lineHeight)/2,0xFFFFFFFF);
+    graphics.text(this.font,"Glacite Tunnels",8,48+(40-this.font.lineHeight)/2,0xFFFFFFFF);
+    graphics.text(this.font,"Misc",8,92+(40-this.font.lineHeight)/2,0xFFFFFFFF);
   }
 
   @Override

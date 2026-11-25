@@ -1,5 +1,7 @@
 package potatoslayer56.miscmining.config;
 
+import org.joml.Vector2i;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,6 +15,10 @@ public class Variables {
   public static boolean nucRunPBTracking = false;
   public static long nucRunPB = 99999999;
   public static boolean moleRemind = false;
+  public static boolean dayCounter;
+  public static Vector2i dayCounterPosition = new Vector2i(100,100);
+  public static boolean parseChatWaypoints = true;
+  public static boolean balSpawningMessage = false;
 
   public static Map<String, Integer> defaultLapisCountsConfig() {
     Map<String, Integer> config = new HashMap<>();

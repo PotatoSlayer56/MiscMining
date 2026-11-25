@@ -3,6 +3,7 @@ package potatoslayer56.miscmining.config.screen;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.StringWidget;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
 import java.util.Map;
@@ -10,8 +11,9 @@ import java.util.Map;
 public class ScreenUtils {
 
   public enum CATEGORIES {
-    CRYSTALHOLLOWS,
-    MISC
+    CRYSTALHOLLOWS(),
+    GLACITETUNNELS(),
+    MISC();
   }
 
   public static Map<String, AbstractWidget> configOption(int x, int y, String title, String description, boolean option, Map<String, AbstractWidget> widgetMap, Font font, String id) {

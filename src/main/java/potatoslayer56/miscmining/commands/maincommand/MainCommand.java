@@ -4,7 +4,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommands;
 import net.minecraft.client.Minecraft;
-import potatoslayer56.miscmining.config.screen.MainConfigScreen;
+import potatoslayer56.miscmining.config.screen.CrystalHollowsConfigScreen;
 
 import static potatoslayer56.miscmining.MiscMining.subCommands;
 
@@ -12,6 +12,12 @@ public class MainCommand {
   public static void register() {
     ClientCommandRegistrationCallback.EVENT.register(((commandDispatcher, commandBuildContext) -> {
       commandDispatcher.register(ClientCommands.literal("miscmining")
+        .executes(commandContext -> {
+          Minecraft.getInstance().execute(() -> {
+            Minecraft.getInstance().gui.setScreen(new CrystalHollowsConfigScreen(Minecraft.getInstance().gui.screen()));
+          });
+          return 0;
+        })
         .then(ClientCommands.argument("subcommand", StringArgumentType.word())
         .suggests(new MainCommandSuggestionsProvider())
         .executes(commandContext -> {
@@ -24,8 +30,15 @@ public class MainCommand {
           return 0;
         })));
     }));
+
     ClientCommandRegistrationCallback.EVENT.register(((commandDispatcher, commandBuildContext) -> {
       commandDispatcher.register(ClientCommands.literal("mm")
+          .executes(commandContext -> {
+            Minecraft.getInstance().execute(() -> {
+              Minecraft.getInstance().gui.setScreen(new CrystalHollowsConfigScreen(Minecraft.getInstance().gui.screen()));
+            });
+            return 0;
+          })
         .then(ClientCommands.argument("subcommand", StringArgumentType.word())
           .suggests(new MainCommandSuggestionsProvider())
           .executes(commandContext -> {
@@ -37,18 +50,6 @@ public class MainCommand {
             });
             return 0;
           })));
-    }));
-    ClientCommandRegistrationCallback.EVENT.register(((commandDispatcher, commandBuildContext) -> {
-      commandDispatcher.register(ClientCommands.literal("miscmining").executes(commandContext -> {
-        Minecraft.getInstance().gui.setScreen(new MainConfigScreen(Minecraft.getInstance().gui.screen()));
-        return 0;
-      }));
-    }));
-    ClientCommandRegistrationCallback.EVENT.register(((commandDispatcher, commandBuildContext) -> {
-      commandDispatcher.register(ClientCommands.literal("mm").executes(commandContext -> {
-        Minecraft.getInstance().gui.setScreen(new MainConfigScreen(Minecraft.getInstance().gui.screen()));
-        return 0;
-      }));
     }));
   }
 }
