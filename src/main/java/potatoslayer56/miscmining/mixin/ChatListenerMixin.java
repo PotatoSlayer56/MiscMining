@@ -10,6 +10,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import potatoslayer56.miscmining.MiscMining;
 import potatoslayer56.miscmining.ShaftParty;
 import potatoslayer56.miscmining.rendering.ModRenderPipeline;
 
@@ -197,17 +198,18 @@ public class ChatListenerMixin {
     }
 
     if (parseChatWaypoints) {
-      Pattern pattern = Pattern.compile("\\{MiscMiningWP-x:\\d{3}-y:\\d{3}-z:\\d{3}\\}");
+      Pattern pattern = Pattern.compile("\\{MiscMiningWP,x:\\d{1,3},y:\\d{1,3},z:\\d{1,3}\\}");
       Matcher matcher = pattern.matcher(message.getString());
       if (matcher.find()){
         String wpMessage = matcher.group(0);
-        String[] splits = wpMessage.split("-");
+        String[] splits = wpMessage.split(",");
         String xString = splits[1].replace("x:","");
         String yString = splits[2].replace("y:","");
         String zString = splits[3].replace("z:","").replace("}","");
         int x = Integer.parseInt(xString);
         int y = Integer.parseInt(yString);
         int z = Integer.parseInt(zString);
+        clientPrefixedMessage("Parsed waypoint at %d %d %d".formatted(x,y,z));
         ModRenderPipeline.waypoints.add(new ModRenderPipeline.WaypointRenderState(x,y,z,0f,0f,1f,1f, ModRenderPipeline.waypointTypes.SINGLE));
       }
     }
