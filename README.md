@@ -2,24 +2,9 @@
 ### A small mod for Hypixel Skyblock that adds some features I like
 ![Modrinth Downloads](https://img.shields.io/modrinth/dt/qYu3vA2S?logo=modrinth) ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/PotatoSlayer56/MiscMining/total?logo=github)
 
-## Features
-- Corpse Key Estimated Profit - Calculates the expected return for a corpse key including pity, assuming maxed extra item chances.
-- Metal Prices - Shows what each form of Umber/Tungsten sells for and how much value you get
-- Shaft Parties - Creates a shaft party that others can be added to and will automatically warp them into specified shafts!
-- Lapis Parties - Toggle this on and the mod will automatically warp your party into shafts!
-- Jungle Cheese - Posts jungle temple cheese coordinated in party chat and adds waypoints to them
-- Party Finder - A party finder that can be used for anything!
-- At Bal Position Message - Let your nucleus run party know when you are at bal
-- Crystal Notify - Notify your nucleus party on crystal progress
-- Shameless Plug - Advertise in party chat whenever the mod automatically warps someone
-- Nucleus Run Profit Share - Shares nucleus run profit in chat - needs skyhanni
-- Low tool notify - Prompts you to refill your inventory on tools when you run out
-- Update Checker - Checks for the latest version
-- Mole Remind - Reminds you to equip mole after grabbing last crystal
-- Nucleus Run PBs - Tracks nucleus run pb
-
 ## Commands
-- `/miscmining <subcommand>` this holds all non shaft party commands
+- `/miscmining` or `/mm` this opens the main config
+- `/miscmining <subcommand>` or `/mm <subcommand>` this holds all non shaft party commands
 - `/toggleshaftparty` creates/disbands a shaft party
 - `/registershaftpartymember` adds a player to your shaft party
 - `/removeshaftpartymember` removes a player from your shaft party
@@ -28,7 +13,7 @@
 Disable profile chat filtering in your mods!
 
 ### How to lapis party
-- Toggle it on with `/miscmining togglelapisparty`
+- Toggle it on in config
 - Mine! Whenever you enter a shaft that is 2l+ it will send `!pt` in party chat then warp the party
 
 ### How to shaft party - All players in party must do this
